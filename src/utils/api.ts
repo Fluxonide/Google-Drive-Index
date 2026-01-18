@@ -59,7 +59,8 @@ export async function fetchFolderContents(
     drive: number,
     path: string,
     pageToken?: string,
-    pageIndex: number = 0
+    pageIndex: number = 0,
+    password?: string
 ): Promise<FileListResponse> {
     // Ensure path ends with /
     const normalizedPath = path.endsWith('/') ? path : path + '/'
@@ -70,6 +71,8 @@ export async function fetchFolderContents(
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+            type: 'folder',
+            password: password || localStorage.getItem(`password_${drive}_${normalizedPath}`) || '',
             page_token: pageToken || null,
             page_index: pageIndex,
         }),
@@ -79,7 +82,22 @@ export async function fetchFolderContents(
         throw new Error(`Failed to fetch: ${response.status}`)
     }
 
-    return response.json()
+    const data = await response.json()
+
+    // Handle password-protected folders
+    if (data.error?.code === 401) {
+        throw new PasswordRequiredError('Password required for this folder')
+    }
+
+    return data
+}
+
+// Custom error for password-protected folders
+export class PasswordRequiredError extends Error {
+    constructor(message: string) {
+        super(message)
+        this.name = 'PasswordRequiredError'
+    }
 }
 
 /**
