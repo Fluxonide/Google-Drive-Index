@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { getFileIcon, formatFileSize } from '../utils/fileIcons'
+import { parsePathInfo, getDownloadUrl, isFolder } from '../utils/api'
 import type { DriveFile } from '../types'
 
 interface FileGridViewProps {
@@ -10,17 +11,18 @@ interface FileGridViewProps {
 
 const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
     const location = useLocation()
+    const { drive, path } = parsePathInfo(location.pathname)
 
     const getItemPath = (file: DriveFile): string => {
         const basePath = location.pathname.endsWith('/')
             ? location.pathname
             : location.pathname + '/'
-        const isFolder = file.mimeType.includes('folder')
-        return `${basePath}${encodeURIComponent(file.name)}${isFolder ? '/' : ''}`
+        const isFolderItem = isFolder(file.mimeType)
+        return `${basePath}${encodeURIComponent(file.name)}${isFolderItem ? '/' : ''}`
     }
 
-    const isFolder = (file: DriveFile): boolean => {
-        return file.mimeType.includes('folder')
+    const getFileDownloadUrl = (file: DriveFile): string => {
+        return getDownloadUrl(drive, path, file.name)
     }
 
     const isImage = (file: DriveFile): boolean => {
@@ -29,8 +31,8 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
 
     // Sort: folders first, then files alphabetically
     const sortedFiles = [...files].sort((a, b) => {
-        const aIsFolder = isFolder(a)
-        const bIsFolder = isFolder(b)
+        const aIsFolder = isFolder(a.mimeType)
+        const bIsFolder = isFolder(b.mimeType)
         if (aIsFolder && !bIsFolder) return -1
         if (!aIsFolder && bIsFolder) return 1
         return a.name.localeCompare(b.name)
@@ -49,9 +51,9 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                         className="block"
                     >
                         <div className="relative aspect-square bg-gray-100 dark:bg-gray-900">
-                            {isImage(file) && file.link ? (
+                            {isImage(file) ? (
                                 <img
-                                    src={file.link}
+                                    src={getFileDownloadUrl(file)}
                                     alt={file.name}
                                     className="h-full w-full object-cover"
                                     loading="lazy"
@@ -60,14 +62,14 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                                 <div className="flex h-full w-full items-center justify-center">
                                     <FontAwesomeIcon
                                         icon={getFileIcon(file.mimeType, file.fileExtension)}
-                                        className={`h-12 w-12 ${isFolder(file) ? 'text-yellow-500' : 'text-gray-400'
+                                        className={`h-12 w-12 ${isFolder(file.mimeType) ? 'text-yellow-500' : 'text-gray-400'
                                             }`}
                                     />
                                 </div>
                             )}
 
                             {/* Hover overlay with actions */}
-                            {!isFolder(file) && (
+                            {!isFolder(file.mimeType) && (
                                 <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
                                     <button
                                         onClick={(e) => {
@@ -80,7 +82,7 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                                         <FontAwesomeIcon icon="eye" className="h-4 w-4" />
                                     </button>
                                     <a
-                                        href={file.link || '#'}
+                                        href={getFileDownloadUrl(file)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         onClick={(e) => e.stopPropagation()}
@@ -104,7 +106,7 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                             {file.name}
                         </Link>
                         <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                            {isFolder(file) ? 'Folder' : formatFileSize(file.size)}
+                            {isFolder(file.mimeType) ? 'Folder' : formatFileSize(file.size)}
                         </p>
                     </div>
                 </div>
