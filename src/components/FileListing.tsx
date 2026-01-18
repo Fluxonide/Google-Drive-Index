@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import toast from 'react-hot-toast'
 import Breadcrumb from './Breadcrumb'
@@ -8,10 +8,17 @@ import FileListView from './FileListView'
 import FileGridView from './FileGridView'
 import Loading from './Loading'
 import FilePreview from './previews/FilePreview'
+import {
+    parsePathInfo,
+    fetchFolderContents,
+    isFilePath as checkIsFilePath,
+    DEFAULT_DRIVE
+} from '../utils/api'
 import type { DriveFile, LayoutType } from '../types'
 
 const FileListing = () => {
     const location = useLocation()
+    const navigate = useNavigate()
     const [files, setFiles] = useState<DriveFile[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -21,60 +28,51 @@ const FileListing = () => {
     const [nextPageToken, setNextPageToken] = useState<string | null>(null)
     const [loadingMore, setLoadingMore] = useState(false)
     const [selectedFile, setSelectedFile] = useState<DriveFile | null>(null)
+    const [pageIndex, setPageIndex] = useState(0)
 
-    // Parse path to determine drive and folder
-    const getPathInfo = () => {
-        const path = location.pathname
-        const match = path.match(/^\/(\d+):(.*)$/)
-        if (match) {
-            return { drive: match[1], path: match[2] || '/' }
+    // Parse current path
+    const { drive, path } = parsePathInfo(location.pathname)
+
+    // Check if current path is a file
+    const isFilePath = () => checkIsFilePath(location.pathname)
+
+    // Redirect to drive root if at base path
+    useEffect(() => {
+        if (location.pathname === '/' || location.pathname === '') {
+            navigate(`/${DEFAULT_DRIVE}:/`, { replace: true })
         }
-        return { drive: '0', path: '/' }
-    }
-
-    // Check if current path is a file (no trailing slash and has extension)
-    const isFilePath = () => {
-        const path = location.pathname
-        return !path.endsWith('/') && path.includes('.')
-    }
+    }, [location.pathname, navigate])
 
     // Fetch folder contents
     const fetchFiles = async (pageToken?: string) => {
-        const { drive, path } = getPathInfo()
-
         if (!pageToken) {
             setLoading(true)
             setFiles([])
+            setPageIndex(0)
         } else {
             setLoadingMore(true)
         }
         setError(null)
 
         try {
-            const response = await fetch(`/${drive}:${path || '/'}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    page_token: pageToken || null,
-                    page_index: 0
-                }),
-            })
-
-            if (!response.ok) {
-                throw new Error(`Failed to fetch: ${response.status}`)
-            }
-
-            const data = await response.json()
+            const data = await fetchFolderContents(
+                drive,
+                path,
+                pageToken,
+                pageToken ? pageIndex + 1 : 0
+            )
 
             if (pageToken) {
                 setFiles(prev => [...prev, ...(data.data?.files || [])])
+                setPageIndex(prev => prev + 1)
             } else {
                 setFiles(data.data?.files || [])
             }
 
             setNextPageToken(data.nextPageToken || null)
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load files')
+            const message = err instanceof Error ? err.message : 'Failed to load files'
+            setError(message)
             toast.error('Failed to load folder contents')
         } finally {
             setLoading(false)
@@ -84,7 +82,7 @@ const FileListing = () => {
 
     // Refetch when path changes
     useEffect(() => {
-        if (!isFilePath()) {
+        if (!isFilePath() && location.pathname !== '/' && location.pathname !== '') {
             fetchFiles()
         }
     }, [location.pathname])

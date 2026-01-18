@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Dialog, Transition } from '@headlessui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { getFileIcon } from '../utils/fileIcons'
+import { searchFiles, DEFAULT_DRIVE } from '../utils/api'
 import type { DriveFile } from '../types'
 
 interface SearchModalProps {
@@ -29,15 +30,7 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
             setError(null)
 
             try {
-                const response = await fetch('/0:search', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ q: query }),
-                })
-
-                if (!response.ok) throw new Error('Search failed')
-
-                const data = await response.json()
+                const data = await searchFiles(DEFAULT_DRIVE, query)
                 setResults(data.data?.files || [])
             } catch (err) {
                 setError('Failed to search. Please try again.')
@@ -53,8 +46,9 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
     const handleResultClick = (file: DriveFile) => {
         onClose()
         setQuery('')
-        // Navigate to file or folder
-        // For now, just close modal - will implement proper navigation later
+        // Navigate to file location
+        // For now we just close the modal - proper path building would require parent path from API
+        navigate(`/${DEFAULT_DRIVE}:/${encodeURIComponent(file.name)}${file.mimeType.includes('folder') ? '/' : ''}`)
     }
 
     return (

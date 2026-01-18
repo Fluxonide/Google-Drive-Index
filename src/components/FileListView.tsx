@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { getFileIcon, formatFileSize, formatDate } from '../utils/fileIcons'
+import { parsePathInfo, getDownloadUrl, isFolder } from '../utils/api'
 import type { DriveFile } from '../types'
 
 interface FileListViewProps {
@@ -10,23 +11,24 @@ interface FileListViewProps {
 
 const FileListView = ({ files, onFileClick }: FileListViewProps) => {
     const location = useLocation()
+    const { drive, path } = parsePathInfo(location.pathname)
 
     const getItemPath = (file: DriveFile): string => {
         const basePath = location.pathname.endsWith('/')
             ? location.pathname
             : location.pathname + '/'
-        const isFolder = file.mimeType.includes('folder')
-        return `${basePath}${encodeURIComponent(file.name)}${isFolder ? '/' : ''}`
+        const isFolderItem = isFolder(file.mimeType)
+        return `${basePath}${encodeURIComponent(file.name)}${isFolderItem ? '/' : ''}`
     }
 
-    const isFolder = (file: DriveFile): boolean => {
-        return file.mimeType.includes('folder')
+    const getFileDownloadUrl = (file: DriveFile): string => {
+        return getDownloadUrl(drive, path, file.name)
     }
 
     // Sort: folders first, then files alphabetically
     const sortedFiles = [...files].sort((a, b) => {
-        const aIsFolder = isFolder(a)
-        const bIsFolder = isFolder(b)
+        const aIsFolder = isFolder(a.mimeType)
+        const bIsFolder = isFolder(b.mimeType)
         if (aIsFolder && !bIsFolder) return -1
         if (!aIsFolder && bIsFolder) return 1
         return a.name.localeCompare(b.name)
@@ -52,7 +54,7 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                     <div className="col-span-12 flex items-center space-x-3 md:col-span-6">
                         <FontAwesomeIcon
                             icon={getFileIcon(file.mimeType, file.fileExtension)}
-                            className={`h-5 w-5 flex-shrink-0 ${isFolder(file) ? 'text-yellow-500' : 'text-gray-400'
+                            className={`h-5 w-5 flex-shrink-0 ${isFolder(file.mimeType) ? 'text-yellow-500' : 'text-gray-400'
                                 }`}
                         />
                         <Link
@@ -70,12 +72,12 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
 
                     {/* Size */}
                     <div className="col-span-2 hidden text-right text-sm text-gray-500 dark:text-gray-400 md:block">
-                        {isFolder(file) ? '—' : formatFileSize(file.size)}
+                        {isFolder(file.mimeType) ? '—' : formatFileSize(file.size)}
                     </div>
 
                     {/* Actions */}
                     <div className="col-span-1 hidden justify-end space-x-2 opacity-0 transition-opacity group-hover:opacity-100 md:flex">
-                        {!isFolder(file) && (
+                        {!isFolder(file.mimeType) && (
                             <button
                                 onClick={() => onFileClick(file)}
                                 className="rounded p-1.5 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
@@ -84,16 +86,18 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                                 <FontAwesomeIcon icon="eye" className="h-4 w-4" />
                             </button>
                         )}
-                        <a
-                            href={file.link || `#`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="rounded p-1.5 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
-                            title="Download"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            <FontAwesomeIcon icon="download" className="h-4 w-4" />
-                        </a>
+                        {!isFolder(file.mimeType) && (
+                            <a
+                                href={getFileDownloadUrl(file)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="rounded p-1.5 text-gray-400 hover:bg-gray-200 hover:text-gray-600 dark:hover:bg-gray-700 dark:hover:text-gray-300"
+                                title="Download"
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <FontAwesomeIcon icon="download" className="h-4 w-4" />
+                            </a>
+                        )}
                     </div>
                 </div>
             ))}
