@@ -1,73 +1,102 @@
-# React + TypeScript + Vite
+# Google Drive Index - Modern React UI
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A beautiful, modern React-based frontend for Google Drive Index, inspired by onedrive-vercel-index.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- ✨ Glass-morphism navbar with search
+- 📁 List and grid view layouts
+- 🔍 Real-time search with debounce
+- 📱 Fully responsive design
+- 🌙 Dark mode support
+- 🖼️ File previews (video, audio, image, PDF)
+- ⌨️ Keyboard shortcuts (⌘K for search)
 
-## React Compiler
+## Quick Deploy - Bundle into Worker
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Step 1: Update Your worker.js
 
-## Expanding the ESLint configuration
+Add this React HTML template to your existing `worker.js`:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```javascript
+// CDN Base URL for React frontend assets
+const CDN_BASE = 'https://cdn.jsdelivr.net/gh/Fluxonide/Google-Drive-Index@main/public/build';
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+// Modern React UI HTML template
+const react_html = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="${uiConfig.favicon || '/favicon.ico'}" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>${authConfig.siteName || 'Google Drive Index'}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="${CDN_BASE}/index-C91SuP-D.css" />
+  </head>
+  <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="${CDN_BASE}/index-B_u2MQcR.js"></script>
+  </body>
+</html>`;
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Step 2: Replace Homepage Response
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Find the line in your `worker.js` where the homepage is returned (usually `return new Response(homepage, ...)`) and replace it with:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```javascript
+return new Response(react_html, {
+  headers: { 'Content-Type': 'text/html; charset=utf-8' }
+});
 ```
+
+### Step 3: Deploy to Cloudflare Workers
+
+Deploy your modified `worker.js` to Cloudflare Workers as usual.
+
+## API Endpoints (Already Working)
+
+The React frontend uses these endpoints that your worker.js already provides:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/{drive}:/path/` | POST | List folder contents |
+| `/{drive}:search` | POST | Search files |
+| `/{drive}:/path/file.ext` | GET | Download file |
+| `/{drive}:/path/file.ext?a=view` | GET | View file |
+
+## Development
+
+```bash
+# Install dependencies
+npm install
+
+# Start dev server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+## CDN URLs
+
+After pushing to GitHub, assets are available at:
+
+- **JS**: `https://cdn.jsdelivr.net/gh/Fluxonide/Google-Drive-Index@main/public/build/index-B_u2MQcR.js`
+- **CSS**: `https://cdn.jsdelivr.net/gh/Fluxonide/Google-Drive-Index@main/public/build/index-C91SuP-D.css`
+
+## Tech Stack
+
+- React 18
+- TypeScript
+- Tailwind CSS 3
+- React Router 6
+- FontAwesome 6
+- Headless UI
+
+## License
+
+MIT
