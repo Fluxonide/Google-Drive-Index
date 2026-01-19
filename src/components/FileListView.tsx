@@ -69,14 +69,17 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
     // Column visibility state (persisted to localStorage)
     const [showModified, setShowModified] = useState<boolean>(() => {
         const stored = localStorage.getItem('showModifiedColumn')
-        return stored !== null ? stored === 'true' : true
+        return stored !== null ? stored !== 'false' : true
     })
 
-    const toggleModifiedColumn = () => {
-        const newValue = !showModified
-        setShowModified(newValue)
-        localStorage.setItem('showModifiedColumn', String(newValue))
-    }
+    // Listen for navbar toggle events
+    useEffect(() => {
+        const handleVisibilityChange = (e: CustomEvent<{ showModified: boolean }>) => {
+            setShowModified(e.detail.showModified)
+        }
+        window.addEventListener('columnVisibilityChange', handleVisibilityChange as EventListener)
+        return () => window.removeEventListener('columnVisibilityChange', handleVisibilityChange as EventListener)
+    }, [])
 
     const getItemPath = (file: DriveFile): string => {
         const basePath = location.pathname.endsWith('/')
@@ -190,16 +193,7 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                     Size
                 </div>
                 <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
-                    <div className="flex items-center space-x-1">
-                        <span>Actions</span>
-                        <button
-                            title={showModified ? 'Hide modified date' : 'Show modified date'}
-                            className="ml-2 cursor-pointer rounded p-1 text-gray-400 hover:bg-gray-300 hover:text-gray-600 dark:hover:bg-gray-600 dark:hover:text-gray-300"
-                            onClick={toggleModifiedColumn}
-                        >
-                            <FontAwesomeIcon icon={showModified ? 'eye-slash' : 'eye'} className="h-3 w-3" />
-                        </button>
-                    </div>
+                    Actions
                 </div>
                 <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
                     {/* Bulk actions */}

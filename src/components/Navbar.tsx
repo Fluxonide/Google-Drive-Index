@@ -31,12 +31,34 @@ const Navbar = () => {
                         to="/"
                         className="flex items-center space-x-2 text-gray-900 transition-opacity hover:opacity-70 dark:text-white"
                     >
-                        <FontAwesomeIcon icon="cloud" className="h-5 w-5 text-blue-500" />
+                        <img
+                            src="https://cdn.jsdelivr.net/gh/Fluxonide/Google-Drive-Index@master/public/icons/64.png"
+                            alt="Logo"
+                            className="h-6 w-6"
+                        />
                         <span className="hidden font-semibold sm:inline">Google Drive Index</span>
                     </Link>
 
                     {/* Right side actions */}
                     <div className="flex items-center space-x-3">
+                        {/* Show/Hide Modified Date toggle */}
+                        <button
+                            title={localStorage.getItem('showModifiedColumn') !== 'false' ? 'Hide modified date' : 'Show modified date'}
+                            className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                            onClick={() => {
+                                const current = localStorage.getItem('showModifiedColumn') !== 'false'
+                                const newValue = !current
+                                localStorage.setItem('showModifiedColumn', String(newValue))
+                                // Dispatch custom event for FileListView to listen
+                                window.dispatchEvent(new CustomEvent('columnVisibilityChange', { detail: { showModified: newValue } }))
+                            }}
+                        >
+                            <FontAwesomeIcon
+                                icon={localStorage.getItem('showModifiedColumn') !== 'false' ? 'eye' : 'eye-slash'}
+                                className="h-4 w-4"
+                            />
+                        </button>
+
                         {/* Search button */}
                         <button
                             onClick={() => setSearchOpen(true)}
