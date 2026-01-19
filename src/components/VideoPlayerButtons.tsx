@@ -16,25 +16,25 @@ const VideoPlayerButtons = ({ videoUrl }: VideoPlayerButtonsProps) => {
     const players = [
         {
             name: 'VLC',
-            icon: '/players/vlc.png',
+            icon: 'https://cdn.jsdelivr.net/gh/Fluxonide/Google-Drive-Index@master/public/players/vlc.png',
             getUrl: () => `vlc://${fullUrl}`,
             color: 'gray',
         },
         {
             name: 'PotPlayer',
-            icon: '/players/potplayer.png',
+            icon: 'https://cdn.jsdelivr.net/gh/Fluxonide/Google-Drive-Index@master/public/players/potplayer.png',
             getUrl: () => `potplayer://${fullUrl}`,
             color: 'gray',
         },
         {
             name: 'IINA',
-            icon: '/players/iina.png',
+            icon: 'https://cdn.jsdelivr.net/gh/Fluxonide/Google-Drive-Index@master/public/players/iina.png',
             getUrl: () => `iina://weblink?url=${encodeURIComponent(fullUrl)}`,
             color: 'gray',
         },
         {
             name: 'nPlayer',
-            icon: '/players/nplayer.png',
+            icon: 'https://cdn.jsdelivr.net/gh/Fluxonide/Google-Drive-Index@master/public/players/nplayer.png',
             getUrl: () => `nplayer-http://${hostname}${videoUrl}`,
             color: 'gray',
         },
