@@ -66,6 +66,18 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
     // File selection state
     const [selected, setSelected] = useState<Record<string, boolean>>({})
 
+    // Column visibility state (persisted to localStorage)
+    const [showModified, setShowModified] = useState<boolean>(() => {
+        const stored = localStorage.getItem('showModifiedColumn')
+        return stored !== null ? stored === 'true' : true
+    })
+
+    const toggleModifiedColumn = () => {
+        const newValue = !showModified
+        setShowModified(newValue)
+        localStorage.setItem('showModifiedColumn', String(newValue))
+    }
+
     const getItemPath = (file: DriveFile): string => {
         const basePath = location.pathname.endsWith('/')
             ? location.pathname
@@ -166,17 +178,28 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
         <div className="rounded bg-white shadow-sm dark:bg-gray-900 dark:text-gray-100">
             {/* Header */}
             <div className="grid grid-cols-12 items-center gap-2 border-b border-gray-900/10 px-3 py-2 dark:border-gray-500/30">
-                <div className="col-span-12 text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:col-span-6">
+                <div className={`col-span-12 text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 ${showModified ? 'md:col-span-6' : 'md:col-span-9'}`}>
                     Name
                 </div>
-                <div className="col-span-3 hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
-                    Last Modified
-                </div>
+                {showModified && (
+                    <div className="col-span-3 hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
+                        Last Modified
+                    </div>
+                )}
                 <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
                     Size
                 </div>
                 <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
-                    Actions
+                    <div className="flex items-center space-x-1">
+                        <span>Actions</span>
+                        <button
+                            title={showModified ? 'Hide modified date' : 'Show modified date'}
+                            className="ml-2 cursor-pointer rounded p-1 text-gray-400 hover:bg-gray-300 hover:text-gray-600 dark:hover:bg-gray-600 dark:hover:text-gray-300"
+                            onClick={toggleModifiedColumn}
+                        >
+                            <FontAwesomeIcon icon={showModified ? 'eye-slash' : 'eye'} className="h-3 w-3" />
+                        </button>
+                    </div>
                 </div>
                 <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
                     {/* Bulk actions */}
@@ -221,7 +244,7 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                             to={getItemPath(file)}
                             className="col-span-12 md:col-span-10 grid grid-cols-10 items-center gap-2 px-3 py-2.5"
                         >
-                            <div className="col-span-10 flex items-center space-x-2 truncate md:col-span-6" title={file.name}>
+                            <div className={`col-span-10 flex items-center space-x-2 truncate ${showModified ? 'md:col-span-6' : 'md:col-span-9'}`} title={file.name}>
                                 <div className="w-5 flex-shrink-0 text-center">
                                     <FontAwesomeIcon
                                         icon={isFolderItem ? ['far', 'folder'] : getFileIcon(file.mimeType, file.fileExtension)}
@@ -232,9 +255,11 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                                     {file.name}
                                 </span>
                             </div>
-                            <div className="col-span-3 hidden flex-shrink-0 font-mono text-sm text-gray-700 dark:text-gray-500 md:block">
-                                {formatDate(file.modifiedTime)}
-                            </div>
+                            {showModified && (
+                                <div className="col-span-3 hidden flex-shrink-0 font-mono text-sm text-gray-700 dark:text-gray-500 md:block">
+                                    {formatDate(file.modifiedTime)}
+                                </div>
+                            )}
                             <div className="hidden flex-shrink-0 truncate font-mono text-sm text-gray-700 dark:text-gray-500 md:block">
                                 {isFolderItem ? '—' : formatFileSize(file.size)}
                             </div>
