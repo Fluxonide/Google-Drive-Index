@@ -32,3 +32,13 @@
 .transition-smooth {
     @apply transition-all duration-150 ease-in-out;
 }
+
+/* Checkbox styling */
+.form-check-input {
+    @apply h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700;
+}
+
+/* Dark mode hover states */
+.dark-hover-bg {
+    @apply dark:hover:bg-gray-850;
+}
