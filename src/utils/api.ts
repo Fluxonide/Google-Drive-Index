@@ -129,19 +129,19 @@ export async function searchFiles(
 }
 
 /**
- * Get download URL for a file
+ * Get download URL for a file (raw/direct download)
  */
 export function getDownloadUrl(drive: number, path: string, filename: string): string {
     const encodedPath = path === '/' ? '' : path
-    return `${API_BASE}/${drive}:${encodedPath}${encodeURIComponent(filename)}?a=view`
+    return `${API_BASE}/${drive}:${encodedPath}${encodeURIComponent(filename)}`
 }
 
 /**
- * Get raw/direct download URL for a file
+ * Get preview/view URL for a file (opens in UI)
  */
-export function getRawDownloadUrl(drive: number, path: string, filename: string): string {
+export function getPreviewUrl(drive: number, path: string, filename: string): string {
     const encodedPath = path === '/' ? '' : path
-    return `${API_BASE}/${drive}:${encodedPath}${encodeURIComponent(filename)}`
+    return `${API_BASE}/${drive}:${encodedPath}${encodeURIComponent(filename)}?a=view`
 }
 
 /**
