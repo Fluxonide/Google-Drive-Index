@@ -242,7 +242,7 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                                 <div className="w-5 flex-shrink-0 text-center">
                                     <FontAwesomeIcon
                                         icon={isFolderItem ? ['far', 'folder'] : getFileIcon(file.mimeType, file.fileExtension)}
-                                        className={`h-4 w-4 ${isFolderItem ? 'text-yellow-500' : 'text-gray-400'}`}
+                                        className={`h-4 w-4 ${isFolderItem ? 'text-gray-500' : 'text-gray-400'}`}
                                     />
                                 </div>
                                 <span className="truncate font-medium text-gray-900 dark:text-white">

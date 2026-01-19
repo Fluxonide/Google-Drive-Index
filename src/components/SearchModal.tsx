@@ -103,7 +103,7 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                                         <div className="flex items-center justify-center py-12">
                                             <FontAwesomeIcon
                                                 icon="spinner"
-                                                className="h-6 w-6 animate-spin text-blue-500"
+                                                className="h-6 w-6 animate-spin text-gray-500"
                                             />
                                             <span className="ml-3 text-gray-500">Searching...</span>
                                         </div>
