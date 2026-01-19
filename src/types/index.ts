@@ -6,6 +6,7 @@ export interface DriveFile {
     mimeType: string
     size?: string
     modifiedTime?: string
+    createdTime?: string
     fileExtension?: string
     link?: string
     driveId?: string
