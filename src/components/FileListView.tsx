@@ -242,6 +242,15 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
 
                         {/* Actions column */}
                         <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
+                            {!isFolderItem && (
+                                <span
+                                    title="Preview file"
+                                    className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
+                                    onClick={() => onFileClick(file)}
+                                >
+                                    <FontAwesomeIcon icon="eye" />
+                                </span>
+                            )}
                             <span
                                 title={isFolderItem ? 'Copy folder link' : 'Copy file link'}
                                 className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
