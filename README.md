@@ -85,8 +85,8 @@ npm run build
 
 After pushing to GitHub, assets are available at:
 
-- **JS**: `https://cdn.jsdelivr.net/gh/Fluxonide/Google-Drive-Index@main/public/build/index-B_u2MQcR.js`
-- **CSS**: `https://cdn.jsdelivr.net/gh/Fluxonide/Google-Drive-Index@main/public/build/index-C91SuP-D.css`
+- **JS**: `https://cdn.jsdelivr.net/gh/Fluxonide/Google-Drive-Index@main/public/build/index.js`
+- **CSS**: `https://cdn.jsdelivr.net/gh/Fluxonide/Google-Drive-Index@main/public/build/index.css`
 
 ## Tech Stack
 
