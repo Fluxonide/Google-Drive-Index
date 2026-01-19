@@ -5,6 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { getFileIcon, formatFileSize, formatDate } from '../../utils/fileIcons'
 import type { DriveFile } from '../../types'
 import toast from 'react-hot-toast'
+import DownloadButtonGroup from '../DownloadButtonGroup'
+import CustomEmbedLinkMenu from '../CustomEmbedLinkMenu'
+import VideoPlayerButtons from '../VideoPlayerButtons'
 
 interface FilePreviewProps {
     file?: DriveFile
@@ -16,7 +19,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
     const navigate = useNavigate()
     const [fileData, setFileData] = useState<DriveFile | null>(file || null)
     const [loading, setLoading] = useState(!file)
-    const [fileContent, setFileContent] = useState<string | null>(null)
+    const [customizeOpen, setCustomizeOpen] = useState(false)
 
     // If no file prop, fetch from current path
     useEffect(() => {
@@ -29,12 +32,9 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
         const fetchFile = async () => {
             setLoading(true)
             try {
-                // Parse path to get file info
                 const pathParts = location.pathname.split('/').filter(Boolean)
                 const fileName = decodeURIComponent(pathParts[pathParts.length - 1])
 
-                // For now, create a mock file object
-                // In production, this would fetch from the API
                 setFileData({
                     id: 'temp',
                     name: fileName,
@@ -56,17 +56,31 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
         const mimeMap: Record<string, string> = {
             mp4: 'video/mp4',
             webm: 'video/webm',
+            mkv: 'video/x-matroska',
+            avi: 'video/x-msvideo',
+            mov: 'video/quicktime',
+            flv: 'video/x-flv',
             mp3: 'audio/mpeg',
             wav: 'audio/wav',
+            flac: 'audio/flac',
+            ogg: 'audio/ogg',
             jpg: 'image/jpeg',
             jpeg: 'image/jpeg',
             png: 'image/png',
             gif: 'image/gif',
             webp: 'image/webp',
+            svg: 'image/svg+xml',
             pdf: 'application/pdf',
             txt: 'text/plain',
             md: 'text/markdown',
             json: 'application/json',
+            js: 'application/javascript',
+            ts: 'application/typescript',
+            html: 'text/html',
+            css: 'text/css',
+            zip: 'application/zip',
+            rar: 'application/x-rar-compressed',
+            '7z': 'application/x-7z-compressed',
         }
         return mimeMap[ext] || 'application/octet-stream'
     }
@@ -75,21 +89,26 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
         if (onClose) {
             onClose()
         } else {
-            // Navigate back to parent folder
             const pathParts = location.pathname.split('/').filter(Boolean)
             pathParts.pop()
             navigate('/' + pathParts.join('/') + '/')
         }
     }
 
+    const isVideo = fileData?.mimeType?.startsWith('video/')
+    const isAudio = fileData?.mimeType?.startsWith('audio/')
+    const isImage = fileData?.mimeType?.startsWith('image/')
+    const isPDF = fileData?.mimeType === 'application/pdf'
+
+    const downloadUrl = fileData?.link || location.pathname.replace(/\/$/, '')
+
     const renderPreview = () => {
         if (!fileData) return null
 
-        const { mimeType, name, link } = fileData
-        const downloadUrl = link || location.pathname.replace(/\/$/, '')
+        const { mimeType, name } = fileData
 
         // Video
-        if (mimeType.startsWith('video/')) {
+        if (isVideo) {
             return (
                 <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
                     <video
@@ -105,7 +124,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
         }
 
         // Audio
-        if (mimeType.startsWith('audio/')) {
+        if (isAudio) {
             return (
                 <div className="flex flex-col items-center space-y-4 p-8">
                     <FontAwesomeIcon icon="music" className="h-24 w-24 text-purple-500" />
@@ -118,7 +137,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
         }
 
         // Image
-        if (mimeType.startsWith('image/')) {
+        if (isImage) {
             return (
                 <div className="flex items-center justify-center p-4">
                     <img
@@ -131,7 +150,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
         }
 
         // PDF
-        if (mimeType === 'application/pdf') {
+        if (isPDF) {
             return (
                 <div className="h-[70vh] w-full overflow-hidden rounded-lg">
                     <iframe
@@ -143,7 +162,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
             )
         }
 
-        // Default: show download option
+        // Default: show file info
         return (
             <div className="flex flex-col items-center space-y-6 p-12">
                 <FontAwesomeIcon
@@ -154,140 +173,202 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                     <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                         {name}
                     </h3>
-                    <p className="mt-1 text-sm text-gray-500">
-                        {formatFileSize(fileData.size)}
-                    </p>
                 </div>
                 <p className="text-sm text-gray-500">
                     Preview not available for this file type
                 </p>
-                <a
-                    href={downloadUrl}
-                    download
-                    className="inline-flex items-center space-x-2 rounded-lg bg-blue-500 px-6 py-3 text-white hover:bg-blue-600"
-                >
-                    <FontAwesomeIcon icon="download" />
-                    <span>Download File</span>
-                </a>
             </div>
         )
     }
 
+    // File metadata section
+    const FileMetadata = () => (
+        <div className="grid grid-cols-2 gap-4 p-4 text-sm md:grid-cols-4">
+            {fileData?.size !== undefined && (
+                <div>
+                    <div className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
+                        File Size
+                    </div>
+                    <div className="mt-1 text-gray-900 dark:text-white">
+                        {formatFileSize(fileData.size)}
+                    </div>
+                </div>
+            )}
+            {fileData?.mimeType && (
+                <div>
+                    <div className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
+                        MIME Type
+                    </div>
+                    <div className="mt-1 font-mono text-gray-900 dark:text-white">
+                        {fileData.mimeType}
+                    </div>
+                </div>
+            )}
+            {fileData?.modifiedTime && (
+                <div>
+                    <div className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
+                        Last Modified
+                    </div>
+                    <div className="mt-1 text-gray-900 dark:text-white">
+                        {formatDate(fileData.modifiedTime)}
+                    </div>
+                </div>
+            )}
+            {fileData?.createdTime && (
+                <div>
+                    <div className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
+                        Created
+                    </div>
+                    <div className="mt-1 text-gray-900 dark:text-white">
+                        {formatDate(fileData.createdTime)}
+                    </div>
+                </div>
+            )}
+        </div>
+    )
+
+    // Download buttons section
+    const ActionButtons = () => (
+        <div className="border-t border-gray-200 p-4 dark:border-gray-700">
+            <DownloadButtonGroup
+                downloadUrl={downloadUrl}
+                fileName={fileData?.name || 'file'}
+                onCustomizeClick={() => setCustomizeOpen(true)}
+            />
+            {isVideo && (
+                <VideoPlayerButtons videoUrl={downloadUrl} />
+            )}
+        </div>
+    )
+
     // Modal view (when file prop provided)
     if (file && onClose) {
         return (
-            <Transition appear show={true} as={Fragment}>
-                <Dialog as="div" className="relative z-50" onClose={handleClose}>
-                    <Transition.Child
-                        as={Fragment}
-                        enter="ease-out duration-200"
-                        enterFrom="opacity-0"
-                        enterTo="opacity-100"
-                        leave="ease-in duration-150"
-                        leaveFrom="opacity-100"
-                        leaveTo="opacity-0"
-                    >
-                        <div className="fixed inset-0 bg-black/70" />
-                    </Transition.Child>
+            <>
+                <CustomEmbedLinkMenu
+                    path={downloadUrl}
+                    fileName={fileData?.name || 'file'}
+                    menuOpen={customizeOpen}
+                    setMenuOpen={setCustomizeOpen}
+                />
+                <Transition appear show={true} as={Fragment}>
+                    <Dialog as="div" className="relative z-50" onClose={handleClose}>
+                        <Transition.Child
+                            as={Fragment}
+                            enter="ease-out duration-200"
+                            enterFrom="opacity-0"
+                            enterTo="opacity-100"
+                            leave="ease-in duration-150"
+                            leaveFrom="opacity-100"
+                            leaveTo="opacity-0"
+                        >
+                            <div className="fixed inset-0 bg-black/70" />
+                        </Transition.Child>
 
-                    <div className="fixed inset-0 overflow-y-auto">
-                        <div className="flex min-h-full items-center justify-center p-4">
-                            <Transition.Child
-                                as={Fragment}
-                                enter="ease-out duration-200"
-                                enterFrom="opacity-0 scale-95"
-                                enterTo="opacity-100 scale-100"
-                                leave="ease-in duration-150"
-                                leaveFrom="opacity-100 scale-100"
-                                leaveTo="opacity-0 scale-95"
-                            >
-                                <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all dark:bg-gray-900">
-                                    {/* Header */}
-                                    <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-700">
-                                        <Dialog.Title className="truncate pr-4 text-lg font-medium text-gray-900 dark:text-white">
-                                            {fileData?.name}
-                                        </Dialog.Title>
-                                        <button
-                                            onClick={handleClose}
-                                            className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
-                                        >
-                                            <FontAwesomeIcon icon="times" className="h-5 w-5" />
-                                        </button>
-                                    </div>
-
-                                    {/* Content */}
-                                    <div className="bg-gray-50 dark:bg-gray-800/50">
-                                        {loading ? (
-                                            <div className="flex items-center justify-center py-20">
-                                                <FontAwesomeIcon icon="spinner" className="h-8 w-8 animate-spin text-blue-500" />
-                                            </div>
-                                        ) : (
-                                            renderPreview()
-                                        )}
-                                    </div>
-
-                                    {/* Footer */}
-                                    <div className="flex items-center justify-between border-t border-gray-200 px-6 py-4 dark:border-gray-700">
-                                        <div className="text-sm text-gray-500">
-                                            {fileData && formatFileSize(fileData.size)}
+                        <div className="fixed inset-0 overflow-y-auto">
+                            <div className="flex min-h-full items-center justify-center p-4">
+                                <Transition.Child
+                                    as={Fragment}
+                                    enter="ease-out duration-200"
+                                    enterFrom="opacity-0 scale-95"
+                                    enterTo="opacity-100 scale-100"
+                                    leave="ease-in duration-150"
+                                    leaveFrom="opacity-100 scale-100"
+                                    leaveTo="opacity-0 scale-95"
+                                >
+                                    <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all dark:bg-gray-900">
+                                        {/* Header */}
+                                        <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                                            <Dialog.Title className="truncate pr-4 text-lg font-medium text-gray-900 dark:text-white">
+                                                {fileData?.name}
+                                            </Dialog.Title>
+                                            <button
+                                                onClick={handleClose}
+                                                className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                                            >
+                                                <FontAwesomeIcon icon="times" className="h-5 w-5" />
+                                            </button>
                                         </div>
-                                        <a
-                                            href={fileData?.link || '#'}
-                                            download
-                                            className="inline-flex items-center space-x-2 rounded-lg bg-blue-500 px-4 py-2 text-sm text-white hover:bg-blue-600"
-                                        >
-                                            <FontAwesomeIcon icon="download" />
-                                            <span>Download</span>
-                                        </a>
-                                    </div>
-                                </Dialog.Panel>
-                            </Transition.Child>
+
+                                        {/* Content */}
+                                        <div className="bg-gray-50 dark:bg-gray-800/50">
+                                            {loading ? (
+                                                <div className="flex items-center justify-center py-20">
+                                                    <FontAwesomeIcon icon="spinner" className="h-8 w-8 animate-spin text-blue-500" />
+                                                </div>
+                                            ) : (
+                                                renderPreview()
+                                            )}
+                                        </div>
+
+                                        {/* Metadata */}
+                                        <FileMetadata />
+
+                                        {/* Action Buttons */}
+                                        <ActionButtons />
+                                    </Dialog.Panel>
+                                </Transition.Child>
+                            </div>
                         </div>
-                    </div>
-                </Dialog>
-            </Transition>
+                    </Dialog>
+                </Transition>
+            </>
         )
     }
 
     // Full page view (direct path navigation)
     return (
-        <div className="mx-auto max-w-4xl px-4 py-8">
-            {/* Back button */}
-            <button
-                onClick={handleClose}
-                className="mb-4 inline-flex items-center space-x-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            >
-                <FontAwesomeIcon icon="arrow-left" />
-                <span>Back to folder</span>
-            </button>
+        <>
+            <CustomEmbedLinkMenu
+                path={downloadUrl}
+                fileName={fileData?.name || 'file'}
+                menuOpen={customizeOpen}
+                setMenuOpen={setCustomizeOpen}
+            />
+            <div className="mx-auto max-w-4xl px-4 py-8">
+                {/* Back button */}
+                <button
+                    onClick={handleClose}
+                    className="mb-4 inline-flex items-center space-x-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                >
+                    <FontAwesomeIcon icon="arrow-left" />
+                    <span>Back to folder</span>
+                </button>
 
-            {/* Preview card */}
-            <div className="overflow-hidden rounded-xl border border-gray-200/50 bg-white shadow-lg dark:border-gray-700/50 dark:bg-gray-900">
-                {/* Header */}
-                <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
-                    <h1 className="text-xl font-medium text-gray-900 dark:text-white">
-                        {fileData?.name}
-                    </h1>
-                    {fileData && (
-                        <p className="mt-1 text-sm text-gray-500">
-                            {formatFileSize(fileData.size)}
-                            {fileData.modifiedTime && ` • Modified ${formatDate(fileData.modifiedTime)}`}
-                        </p>
-                    )}
-                </div>
+                {/* Preview card */}
+                <div className="overflow-hidden rounded-xl border border-gray-200/50 bg-white shadow-lg dark:border-gray-700/50 dark:bg-gray-900">
+                    {/* Header */}
+                    <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
+                        <h1 className="text-xl font-medium text-gray-900 dark:text-white">
+                            {fileData?.name}
+                        </h1>
+                        {fileData && (
+                            <p className="mt-1 text-sm text-gray-500">
+                                {formatFileSize(fileData.size)}
+                                {fileData.modifiedTime && ` • Modified ${formatDate(fileData.modifiedTime)}`}
+                            </p>
+                        )}
+                    </div>
 
-                {/* Content */}
-                <div className="bg-gray-50 dark:bg-gray-800/50">
-                    {loading ? (
-                        <div className="flex items-center justify-center py-20">
-                            <FontAwesomeIcon icon="spinner" className="h-8 w-8 animate-spin text-blue-500" />
-                        </div>
-                    ) : (
-                        renderPreview()
-                    )}
+                    {/* Content */}
+                    <div className="bg-gray-50 dark:bg-gray-800/50">
+                        {loading ? (
+                            <div className="flex items-center justify-center py-20">
+                                <FontAwesomeIcon icon="spinner" className="h-8 w-8 animate-spin text-blue-500" />
+                            </div>
+                        ) : (
+                            renderPreview()
+                        )}
+                    </div>
+
+                    {/* Metadata */}
+                    <FileMetadata />
+
+                    {/* Action Buttons */}
+                    <ActionButtons />
                 </div>
             </div>
-        </div>
+        </>
     )
 }
 

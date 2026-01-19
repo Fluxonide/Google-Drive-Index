@@ -1,8 +1,8 @@
 // Modern React UI Template for Google Drive Index Worker
 // This file contains the HTML template that loads the React frontend from CDN
 
-// CDN Base URL for built assets (jsDelivr)
-const CDN_BASE = 'https://cdn.jsdelivr.net/gh/Fluxonide/Google-Drive-Index@main/public/build';
+// CDN Base URL for built assets (using raw GitHub URL for immediate availability)
+const CDN_BASE = 'https://raw.githubusercontent.com/Fluxonide/Google-Drive-Index/main/public/build';
 
 // React HTML template that replaces the old Bootstrap UI
 const react_html = (siteName, favicon) => `<!DOCTYPE html>
