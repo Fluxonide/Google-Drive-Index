@@ -62,7 +62,7 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                                 <div className="flex h-full w-full items-center justify-center">
                                     <FontAwesomeIcon
                                         icon={getFileIcon(file.mimeType, file.fileExtension)}
-                                        className={`h-12 w-12 ${isFolder(file.mimeType) ? 'text-yellow-500' : 'text-gray-400'
+                                        className={`h-12 w-12 ${isFolder(file.mimeType) ? 'text-gray-500' : 'text-gray-400'
                                             }`}
                                     />
                                 </div>

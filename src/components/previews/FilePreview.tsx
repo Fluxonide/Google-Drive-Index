@@ -294,7 +294,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                                         <div className="bg-gray-50 dark:bg-gray-800/50">
                                             {loading ? (
                                                 <div className="flex items-center justify-center py-20">
-                                                    <FontAwesomeIcon icon="spinner" className="h-8 w-8 animate-spin text-blue-500" />
+                                                    <FontAwesomeIcon icon="spinner" className="h-8 w-8 animate-spin text-gray-500" />
                                                 </div>
                                             ) : (
                                                 renderPreview()
@@ -354,7 +354,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                     <div className="bg-gray-50 dark:bg-gray-800/50">
                         {loading ? (
                             <div className="flex items-center justify-center py-20">
-                                <FontAwesomeIcon icon="spinner" className="h-8 w-8 animate-spin text-blue-500" />
+                                <FontAwesomeIcon icon="spinner" className="h-8 w-8 animate-spin text-gray-500" />
                             </div>
                         ) : (
                             renderPreview()
