@@ -86,7 +86,8 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
             ? location.pathname
             : location.pathname + '/'
         const isFolderItem = isFolder(file.mimeType)
-        return `${basePath}${encodeURIComponent(file.name)}${isFolderItem ? '/' : ''}`
+        // Folders get trailing slash, files get ?a=view for preview
+        return `${basePath}${encodeURIComponent(file.name)}${isFolderItem ? '/' : '?a=view'}`
     }
 
     const getFileDownloadUrl = (file: DriveFile): string => {
