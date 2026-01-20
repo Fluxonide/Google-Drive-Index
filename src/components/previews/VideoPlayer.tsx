@@ -1,5 +1,5 @@
 import { useEffect, useRef, FC } from 'react'
-import DPlayer from 'dplayer'
+import DPlayer from 'dplayer-enhanced'
 
 interface VideoPlayerProps {
     videoUrl: string
@@ -9,7 +9,7 @@ interface VideoPlayerProps {
 
 const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster }) => {
     const containerRef = useRef<HTMLDivElement>(null)
-    const playerRef = useRef<DPlayer | null>(null)
+    const playerRef = useRef<any>(null)
 
     useEffect(() => {
         if (!containerRef.current) return
