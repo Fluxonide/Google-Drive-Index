@@ -1,4 +1,4 @@
-declare module 'dplayer' {
+declare module 'dplayer-enhanced' {
     interface DPlayerOptions {
         container: HTMLElement
         live?: boolean
