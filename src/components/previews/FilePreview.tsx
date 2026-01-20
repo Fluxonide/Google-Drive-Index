@@ -8,6 +8,8 @@ import toast from 'react-hot-toast'
 import DownloadButtonGroup from '../DownloadButtonGroup'
 import CustomEmbedLinkMenu from '../CustomEmbedLinkMenu'
 import VideoPlayerButtons from '../VideoPlayerButtons'
+import VideoPlayer from './VideoPlayer'
+import AudioPlayer from './AudioPlayer'
 
 interface FilePreviewProps {
     file?: DriveFile
@@ -110,29 +112,21 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
         // Video
         if (isVideo) {
             return (
-                <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
-                    <video
-                        controls
-                        autoPlay
-                        className="h-full w-full"
-                        src={downloadUrl}
-                    >
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
+                <VideoPlayer
+                    videoUrl={downloadUrl}
+                    videoName={name}
+                />
             )
         }
 
         // Audio
         if (isAudio) {
             return (
-                <div className="flex flex-col items-center space-y-4 p-8">
-                    <FontAwesomeIcon icon="music" className="h-24 w-24 text-purple-500" />
-                    <audio controls autoPlay className="w-full max-w-lg">
-                        <source src={downloadUrl} type={mimeType} />
-                        Your browser does not support the audio tag.
-                    </audio>
-                </div>
+                <AudioPlayer
+                    audioUrl={downloadUrl}
+                    fileName={name}
+                    modifiedTime={fileData?.modifiedTime}
+                />
             )
         }
 
