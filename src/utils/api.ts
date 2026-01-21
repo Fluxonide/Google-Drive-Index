@@ -55,6 +55,57 @@ export function parsePathInfo(pathname: string): { drive: number; path: string }
 /**
  * Fetch folder contents from the Worker API
  */
+// MOCK DATA FOR LOCAL DEV
+export const MOCK_FILES: DriveFile[] = [
+    {
+        id: 'folder1',
+        name: 'Sample Folder',
+        mimeType: 'application/vnd.google-apps.folder',
+        modifiedTime: new Date().toISOString(),
+        size: '0',
+        driveId: '0'
+    },
+    {
+        id: 'vid1',
+        name: 'Big Buck Bunny.mp4',
+        mimeType: 'video/mp4',
+        size: '150000000',
+        modifiedTime: new Date().toISOString(),
+        // Use a real external sample video for testing player
+        link: 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4'
+    },
+    {
+        id: 'img1',
+        name: 'Sample Image.jpg',
+        mimeType: 'image/jpeg',
+        size: '250000',
+        modifiedTime: new Date().toISOString()
+    },
+    {
+        id: 'audio1',
+        name: 'Sample Audio.mp3',
+        mimeType: 'audio/mpeg',
+        size: '5000000',
+        modifiedTime: new Date().toISOString(),
+        link: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+    },
+    {
+        id: 'pdf1',
+        name: 'Sample Document.pdf',
+        mimeType: 'application/pdf',
+        size: '1024000',
+        modifiedTime: new Date().toISOString(),
+        link: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+    },
+    {
+        id: 'zip1',
+        name: 'Sample Archive.zip',
+        mimeType: 'application/zip',
+        size: '2048000',
+        modifiedTime: new Date().toISOString()
+    }
+]
+
 export async function fetchFolderContents(
     drive: number,
     path: string,
@@ -64,6 +115,22 @@ export async function fetchFolderContents(
 ): Promise<FileListResponse> {
     // Ensure path ends with /
     const normalizedPath = path.endsWith('/') ? path : path + '/'
+
+    // MOCK DATA FOR LOCAL DEV
+    if (import.meta.env.DEV) {
+        console.log('Returning mock data for DEV mode')
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve({
+                    nextPageToken: null,
+                    curPageIndex: 0,
+                    data: {
+                        files: MOCK_FILES
+                    }
+                })
+            }, 500)
+        })
+    }
 
     const response = await fetch(`${API_BASE}/${drive}:${normalizedPath}`, {
         method: 'POST',
@@ -109,6 +176,20 @@ export async function searchFiles(
     pageToken?: string,
     pageIndex: number = 0
 ): Promise<SearchResponse> {
+    // MOCK DATA FOR LOCAL DEV
+    if (import.meta.env.DEV) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const results = MOCK_FILES.filter(f => f.name.toLowerCase().includes(query.toLowerCase()))
+                resolve({
+                    nextPageToken: null,
+                    curPageIndex: 0,
+                    data: { files: results }
+                })
+            }, 500)
+        })
+    }
+
     const response = await fetch(`${API_BASE}/${drive}:search`, {
         method: 'POST',
         headers: {
