@@ -34,7 +34,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="sticky top-0 z-50 border-b border-gray-200/50 bg-white/80 backdrop-blur-md dark:border-gray-700/50 dark:bg-gray-900/80">
+            <nav className="sticky top-0 z-50 border-b border-gray-200/50 bg-white/80 backdrop-blur-md dark:border-gray-700/50 dark:bg-gray-900">
                 <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-2">
                     {/* Logo */}
                     <Link

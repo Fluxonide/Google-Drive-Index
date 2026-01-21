@@ -1,5 +1,5 @@
 import { useState, Fragment, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import { Dialog, Transition } from '@headlessui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { getFileIcon } from '../utils/fileIcons'
@@ -125,8 +125,12 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                                         <ul className="divide-y divide-gray-100 dark:divide-gray-800">
                                             {results.map((file) => (
                                                 <li key={file.id}>
-                                                    <button
-                                                        onClick={() => handleResultClick(file)}
+                                                    <Link
+                                                        to={`/${DEFAULT_DRIVE}:/${encodeURIComponent(file.name)}${file.mimeType.includes('folder') ? '/' : '?a=view'}`}
+                                                        onClick={() => {
+                                                            onClose()
+                                                            setQuery('')
+                                                        }}
                                                         className="flex w-full items-center space-x-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
                                                     >
                                                         <FontAwesomeIcon
@@ -137,11 +141,8 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                                                             <div className="truncate font-medium text-gray-900 dark:text-white">
                                                                 {file.name}
                                                             </div>
-                                                            <div className="truncate text-sm text-gray-500">
-                                                                {file.size || 'Folder'}
-                                                            </div>
                                                         </div>
-                                                    </button>
+                                                    </Link>
                                                 </li>
                                             ))}
                                         </ul>
