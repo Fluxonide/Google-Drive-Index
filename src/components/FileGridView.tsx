@@ -44,14 +44,14 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
             {sortedFiles.map((file) => (
                 <div
                     key={file.id}
-                    className="group relative overflow-hidden rounded-lg border border-gray-200/50 bg-white transition-all hover:border-gray-300 hover:shadow-md dark:border-gray-700/50 dark:bg-gray-900 dark:hover:border-gray-600"
+                    className="group relative overflow-hidden rounded-lg border border-gray-200/50 bg-white transition-all hover:border-gray-300 hover:shadow-md dark:border-gray-700/50 dark:bg-[#18181B] dark:hover:border-gray-600"
                 >
                     {/* Thumbnail area */}
                     <Link
                         to={getItemPath(file)}
                         className="block"
                     >
-                        <div className="relative aspect-square bg-gray-100 dark:bg-gray-900">
+                        <div className="relative aspect-square bg-gray-100 dark:bg-[#18181B]">
                             {isImage(file) ? (
                                 <img
                                     src={getFileDownloadUrl(file)}
