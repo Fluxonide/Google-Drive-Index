@@ -99,7 +99,7 @@ export default function CustomEmbedLinkMenu({
                         leaveFrom="opacity-100 scale-100"
                         leaveTo="opacity-0 scale-95"
                     >
-                        <div className="inline-block max-h-[80vh] w-full max-w-2xl transform overflow-hidden overflow-y-scroll rounded-xl border border-gray-400/30 bg-white p-6 text-left align-middle shadow-2xl transition-all dark:bg-gray-900 dark:text-white">
+                        <div className="inline-block max-h-[80vh] w-full max-w-2xl transform overflow-hidden overflow-y-scroll rounded-xl border border-gray-400/30 bg-white p-6 text-left align-middle shadow-2xl transition-all dark:bg-[#18181B] dark:text-white">
                             {/* Header */}
                             <div className="flex items-center justify-between mb-4">
                                 <Dialog.Title as="h3" className="text-xl font-bold">

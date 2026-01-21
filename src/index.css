@@ -34,9 +34,13 @@
     }
 }
 
-/* Glass morphism helper */
 .glass {
-    @apply bg-white/80 backdrop-blur-md dark:bg-gray-900/80;
+    @apply bg-white/80 backdrop-blur-md;
+}
+
+.dark .glass {
+    background-color: rgba(24, 24, 27, 0.8);
+    backdrop-filter: blur(12px);
 }
 
 /* Smooth transitions for all interactive elements */

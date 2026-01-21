@@ -258,7 +258,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                     <FontAwesomeIcon icon="spinner" className="h-8 w-8 animate-spin text-gray-500" />
                 </div>
             ) : isVideo ? (
-                <div className="overflow-hidden rounded-xl border border-gray-200/50 bg-white shadow-lg dark:border-gray-700/50 dark:bg-gray-900">
+                <div className="overflow-hidden rounded-xl border border-gray-200/50 bg-white shadow-lg dark:border-gray-700/50 dark:bg-[#18181B]">
                     <div className="bg-gray-50 dark:bg-gray-800/50">
                         {renderPreviewContent()}
                     </div>
@@ -327,7 +327,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                                     leaveFrom="opacity-100 scale-100"
                                     leaveTo="opacity-0 scale-95"
                                 >
-                                    <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all dark:bg-gray-900">
+                                    <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all dark:bg-[#18181B]">
                                         {/* Header */}
                                         <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4 dark:border-gray-700">
                                             <Dialog.Title className="truncate pr-4 text-lg font-medium text-gray-900 dark:text-white">
