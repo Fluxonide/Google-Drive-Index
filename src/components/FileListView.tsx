@@ -179,7 +179,7 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
     }
 
     return (
-        <div className="rounded bg-white shadow-sm dark:bg-gray-900 dark:text-gray-100">
+        <div className="rounded bg-white shadow-sm dark:bg-[#18181B] dark:text-gray-100">
             {/* Header */}
             <div className="grid grid-cols-12 items-center gap-2 border-b border-gray-900/10 px-3 py-2 dark:border-gray-500/30">
                 <div className={`col-span-12 text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 ${showModified ? 'md:col-span-6' : 'md:col-span-9'}`}>

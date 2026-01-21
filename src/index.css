@@ -5,8 +5,19 @@
 @tailwind utilities;
 
 @layer base {
+    :root {
+        --color-body-bg: theme('colors.gray.50');
+        --color-box-bg: white;
+    }
+
+    .dark {
+        --color-body-bg: #27272A;
+        --color-box-bg: #18181B;
+    }
+
     body {
-        @apply bg-gray-50 text-gray-900 dark:bg-gray-800 dark:text-gray-100;
+        @apply text-gray-900 dark:text-gray-100;
+        background-color: var(--color-body-bg);
     }
 }
 
