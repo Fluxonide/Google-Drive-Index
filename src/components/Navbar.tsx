@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { Dialog, Transition } from '@headlessui/react'
@@ -8,19 +8,29 @@ const Navbar = () => {
     const [searchOpen, setSearchOpen] = useState(false)
     const navigate = useNavigate()
 
-    // Keyboard shortcut for search (Ctrl/Cmd + K)
-    const handleKeyDown = (e: KeyboardEvent) => {
-        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-            e.preventDefault()
-            setSearchOpen(true)
-        }
-    }
+    const [showModified, setShowModified] = useState(() => localStorage.getItem('showModifiedColumn') !== 'false')
 
-    // Set up keyboard listener
-    useState(() => {
+    // Keyboard shortcut for search (Ctrl/Cmd + K)
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault()
+                e.stopPropagation() // Stop event bubbling
+                setSearchOpen(true)
+            }
+        }
+
         document.addEventListener('keydown', handleKeyDown)
         return () => document.removeEventListener('keydown', handleKeyDown)
-    })
+    }, [])
+
+    const toggleModifiedColumn = () => {
+        const newValue = !showModified
+        setShowModified(newValue)
+        localStorage.setItem('showModifiedColumn', String(newValue))
+        // Dispatch custom event for FileListView to listen
+        window.dispatchEvent(new CustomEvent('columnVisibilityChange', { detail: { showModified: newValue } }))
+    }
 
     return (
         <>
@@ -43,18 +53,12 @@ const Navbar = () => {
                     <div className="flex items-center space-x-3">
                         {/* Show/Hide Modified Date toggle */}
                         <button
-                            title={localStorage.getItem('showModifiedColumn') !== 'false' ? 'Hide modified date' : 'Show modified date'}
+                            title={showModified ? 'Hide modified date' : 'Show modified date'}
                             className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
-                            onClick={() => {
-                                const current = localStorage.getItem('showModifiedColumn') !== 'false'
-                                const newValue = !current
-                                localStorage.setItem('showModifiedColumn', String(newValue))
-                                // Dispatch custom event for FileListView to listen
-                                window.dispatchEvent(new CustomEvent('columnVisibilityChange', { detail: { showModified: newValue } }))
-                            }}
+                            onClick={toggleModifiedColumn}
                         >
                             <FontAwesomeIcon
-                                icon={localStorage.getItem('showModifiedColumn') !== 'false' ? 'eye' : 'eye-slash'}
+                                icon={showModified ? 'eye' : 'eye-slash'}
                                 className="h-4 w-4"
                             />
                         </button>

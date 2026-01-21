@@ -49,7 +49,7 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster }) => {
     }, [videoUrl, videoName, poster])
 
     return (
-        <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
+        <div className="mx-auto aspect-video w-full max-h-[80vh] overflow-hidden rounded-lg bg-black">
             <div ref={containerRef} className="h-full w-full" />
         </div>
     )
