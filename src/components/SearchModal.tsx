@@ -77,7 +77,7 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5 transition-all dark:bg-gray-900 dark:ring-white/10">
+                            <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-black/5 transition-all dark:bg-[#18181B] dark:ring-white/10">
                                 {/* Search input */}
                                 <div className="flex items-center border-b border-gray-200 px-4 dark:border-gray-700">
                                     <FontAwesomeIcon
