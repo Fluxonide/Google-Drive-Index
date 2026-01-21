@@ -7,9 +7,10 @@ import type { DriveFile } from '../../types'
 import toast from 'react-hot-toast'
 import DownloadButtonGroup from '../DownloadButtonGroup'
 import CustomEmbedLinkMenu from '../CustomEmbedLinkMenu'
-import VideoPlayerButtons from '../VideoPlayerButtons'
+
 import VideoPlayer from './VideoPlayer'
 import AudioPlayer from './AudioPlayer'
+import Breadcrumb from '../Breadcrumb'
 
 interface FilePreviewProps {
     file?: DriveFile
@@ -177,7 +178,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
 
     // File metadata section
     const FileMetadata = () => (
-        <div className="grid grid-cols-2 gap-4 p-4 text-sm md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
             {fileData?.size !== undefined && (
                 <div>
                     <div className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
@@ -221,19 +222,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
         </div>
     )
 
-    // Download buttons section
-    const ActionButtons = () => (
-        <div className="border-t border-gray-200 p-4 dark:border-gray-700">
-            <DownloadButtonGroup
-                downloadUrl={downloadUrl}
-                fileName={fileData?.name || 'file'}
-                onCustomizeClick={() => setCustomizeOpen(true)}
-            />
-            {isVideo && (
-                <VideoPlayerButtons videoUrl={downloadUrl} />
-            )}
-        </div>
-    )
+
 
     // Modal view (when file prop provided)
     if (file && onClose) {
@@ -295,11 +284,18 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                                             )}
                                         </div>
 
-                                        {/* Metadata */}
-                                        <FileMetadata />
+                                        {/* Metadata & Actions */}
+                                        <div className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
+                                            <FileMetadata />
 
-                                        {/* Action Buttons */}
-                                        <ActionButtons />
+                                            <div className="flex justify-center md:justify-end">
+                                                <DownloadButtonGroup
+                                                    downloadUrl={downloadUrl}
+                                                    fileName={fileData?.name || 'file'}
+                                                    onCustomizeClick={() => setCustomizeOpen(true)}
+                                                />
+                                            </div>
+                                        </div>
                                     </Dialog.Panel>
                                 </Transition.Child>
                             </div>
@@ -319,30 +315,13 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                 menuOpen={customizeOpen}
                 setMenuOpen={setCustomizeOpen}
             />
-            <div className="mx-auto max-w-4xl px-4 py-8">
-                {/* Back button */}
-                <button
-                    onClick={handleClose}
-                    className="mb-4 inline-flex items-center space-x-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                    <FontAwesomeIcon icon="arrow-left" />
-                    <span>Back to folder</span>
-                </button>
+            <div className="mx-auto max-w-6xl px-4 py-4">
+                <div className="mb-4">
+                    <Breadcrumb />
+                </div>
 
                 {/* Preview card */}
                 <div className="overflow-hidden rounded-xl border border-gray-200/50 bg-white shadow-lg dark:border-gray-700/50 dark:bg-gray-900">
-                    {/* Header */}
-                    <div className="border-b border-gray-200 px-6 py-4 dark:border-gray-700">
-                        <h1 className="text-xl font-medium text-gray-900 dark:text-white">
-                            {fileData?.name}
-                        </h1>
-                        {fileData && (
-                            <p className="mt-1 text-sm text-gray-500">
-                                {formatFileSize(fileData.size)}
-                                {fileData.modifiedTime && ` • Modified ${formatDate(fileData.modifiedTime)}`}
-                            </p>
-                        )}
-                    </div>
 
                     {/* Content */}
                     <div className="bg-gray-50 dark:bg-gray-800/50">
@@ -355,11 +334,18 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                         )}
                     </div>
 
-                    {/* Metadata */}
-                    <FileMetadata />
+                    {/* Metadata & Actions */}
+                    <div className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-between">
+                        <FileMetadata />
 
-                    {/* Action Buttons */}
-                    <ActionButtons />
+                        <div className="flex justify-center md:justify-end">
+                            <DownloadButtonGroup
+                                downloadUrl={downloadUrl}
+                                fileName={fileData?.name || 'file'}
+                                onCustomizeClick={() => setCustomizeOpen(true)}
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </>
