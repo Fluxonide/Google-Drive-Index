@@ -125,8 +125,8 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                                         <ul className="divide-y divide-gray-100 dark:divide-gray-800">
                                             {results.map((file) => (
                                                 <li key={file.id}>
-                                                    <Link
-                                                        to={`/${DEFAULT_DRIVE}:/${encodeURIComponent(file.name)}${file.mimeType.includes('folder') ? '/' : '?a=view'}`}
+                                                    <a
+                                                        href={`/${DEFAULT_DRIVE}:findpath?id=${file.id}&view=true`}
                                                         onClick={() => {
                                                             onClose()
                                                             setQuery('')
@@ -142,7 +142,7 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                                                                 {file.name}
                                                             </div>
                                                         </div>
-                                                    </Link>
+                                                    </a>
                                                 </li>
                                             ))}
                                         </ul>
