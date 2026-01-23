@@ -210,6 +210,45 @@ export async function searchFiles(
 }
 
 /**
+ * Rename a file
+ */
+export async function renameFile(
+    drive: number,
+    fileId: string,
+    newName: string
+): Promise<any> {
+    // MOCK DATA FOR LOCAL DEV
+    if (import.meta.env.DEV) {
+        console.log('Renaming file in DEV mode', fileId, newName)
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const file = MOCK_FILES.find(f => f.id === fileId)
+                if (file) file.name = newName
+                resolve({ success: true, name: newName })
+            }, 500)
+        })
+    }
+
+    const response = await fetch(`${API_BASE}/${drive}:rename`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            id: fileId,
+            name: newName,
+        }),
+    })
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Unknown error' }))
+        throw new Error(error.message || `Rename failed: ${response.status}`)
+    }
+
+    return response.json()
+}
+
+/**
  * Get download URL for a file (raw/direct download)
  */
 export function getDownloadUrl(drive: number, path: string, filename: string): string {

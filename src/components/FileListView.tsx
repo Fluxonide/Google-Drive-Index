@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, MouseEventHandler } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { getFileIcon, formatFileSize, formatDate } from '../utils/fileIcons'
-import { parsePathInfo, getDownloadUrl, isFolder } from '../utils/api'
+import { parsePathInfo, getDownloadUrl, isFolder, renameFile } from '../utils/api'
 import type { DriveFile } from '../types'
 import toast from 'react-hot-toast'
 
@@ -178,6 +178,22 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
         })
     }
 
+    const handleRename = async (file: DriveFile) => {
+        const newName = window.prompt('Enter new name:', file.name)
+        if (newName && newName !== file.name) {
+            const loadingToast = toast.loading('Renaming file...')
+            try {
+                await renameFile(drive, file.id, newName)
+                toast.success('File renamed successfully', { id: loadingToast })
+                // Reload to reflect changes
+                setTimeout(() => window.location.reload(), 500)
+            } catch (error) {
+                console.error(error)
+                toast.error('Failed to rename file', { id: loadingToast })
+            }
+        }
+    }
+
     return (
         <div className="rounded bg-white shadow-sm dark:bg-[#18181B] dark:text-gray-100">
             {/* Header */}
@@ -277,6 +293,13 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                                 onClick={() => copyFileLink(file)}
                             >
                                 <FontAwesomeIcon icon={['far', 'copy']} />
+                            </span>
+                            <span
+                                title="Rename file"
+                                className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
+                                onClick={() => handleRename(file)}
+                            >
+                                <FontAwesomeIcon icon="pen-to-square" />
                             </span>
                             {!isFolderItem && (
                                 <a
