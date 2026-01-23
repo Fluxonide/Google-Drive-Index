@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { getFileIcon, formatFileSize } from '../utils/fileIcons'
-import { parsePathInfo, getDownloadUrl, isFolder } from '../utils/api'
+import { parsePathInfo, getDownloadUrl, isFolder, renameFile } from '../utils/api'
 import type { DriveFile } from '../types'
+import toast from 'react-hot-toast'
 
 interface FileGridViewProps {
     files: DriveFile[]
@@ -39,6 +40,22 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
         return a.name.localeCompare(b.name)
     })
 
+    const handleRename = async (file: DriveFile) => {
+        const newName = window.prompt('Enter new name:', file.name)
+        if (newName && newName !== file.name) {
+            const loadingToast = toast.loading('Renaming file...')
+            try {
+                await renameFile(drive, file.id, newName)
+                toast.success('File renamed successfully', { id: loadingToast })
+                // Reload to reflect changes
+                setTimeout(() => window.location.reload(), 500)
+            } catch (error) {
+                console.error(error)
+                toast.error('Failed to rename file', { id: loadingToast })
+            }
+        }
+    }
+
     return (
         <div className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {sortedFiles.map((file) => (
@@ -70,30 +87,43 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                             )}
 
                             {/* Hover overlay with actions */}
-                            {!isFolder(file.mimeType) && (
-                                <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault()
-                                            onFileClick(file)
-                                        }}
-                                        className="rounded-full bg-white/90 p-2 text-gray-900 hover:bg-white"
-                                        title="Preview"
-                                    >
-                                        <FontAwesomeIcon icon="eye" className="h-4 w-4" />
-                                    </button>
-                                    <a
-                                        href={getFileDownloadUrl(file)}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="rounded-full bg-white/90 p-2 text-gray-900 hover:bg-white"
-                                        title="Download"
-                                    >
-                                        <FontAwesomeIcon icon="download" className="h-4 w-4" />
-                                    </a>
-                                </div>
-                            )}
+                            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                                {!isFolder(file.mimeType) && (
+                                    <>
+                                        <button
+                                            onClick={(e) => {
+                                                e.preventDefault()
+                                                onFileClick(file)
+                                            }}
+                                            className="rounded-full bg-white/90 p-2 text-gray-900 hover:bg-white"
+                                            title="Preview"
+                                        >
+                                            <FontAwesomeIcon icon="eye" className="h-4 w-4" />
+                                        </button>
+                                        <a
+                                            href={getFileDownloadUrl(file)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="rounded-full bg-white/90 p-2 text-gray-900 hover:bg-white"
+                                            title="Download"
+                                        >
+                                            <FontAwesomeIcon icon="download" className="h-4 w-4" />
+                                        </a>
+                                    </>
+                                )}
+                                <button
+                                    onClick={(e) => {
+                                        e.preventDefault()
+                                        e.stopPropagation()
+                                        handleRename(file)
+                                    }}
+                                    className="rounded-full bg-white/90 p-2 text-gray-900 hover:bg-white"
+                                    title="Rename"
+                                >
+                                    <FontAwesomeIcon icon="pen-to-square" className="h-4 w-4" />
+                                </button>
+                            </div>
                         </div>
                     </Link>
 
