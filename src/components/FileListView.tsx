@@ -5,6 +5,7 @@ import { getFileIcon, formatFileSize, formatDate } from '../utils/fileIcons'
 import { parsePathInfo, getDownloadUrl, isFolder, renameFile } from '../utils/api'
 import type { DriveFile } from '../types'
 import toast from 'react-hot-toast'
+import RenameModal from './RenameModal'
 
 // Checkbox component with indeterminate state support
 interface CheckboxProps {
@@ -65,6 +66,10 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
 
     // File selection state
     const [selected, setSelected] = useState<Record<string, boolean>>({})
+
+    // Rename state
+    const [renameModalOpen, setRenameModalOpen] = useState(false)
+    const [fileToRename, setFileToRename] = useState<DriveFile | null>(null)
 
     // Column visibility state (persisted to localStorage)
     const [showModified, setShowModified] = useState<boolean>(() => {
@@ -178,19 +183,23 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
         })
     }
 
-    const handleRename = async (file: DriveFile) => {
-        const newName = window.prompt('Enter new name:', file.name)
-        if (newName && newName !== file.name) {
-            const loadingToast = toast.loading('Renaming file...')
-            try {
-                await renameFile(drive, file.id, newName)
-                toast.success('File renamed successfully', { id: loadingToast })
-                // Reload to reflect changes
-                setTimeout(() => window.location.reload(), 500)
-            } catch (error) {
-                console.error(error)
-                toast.error('Failed to rename file', { id: loadingToast })
-            }
+    const handleRenameClick = (file: DriveFile) => {
+        setFileToRename(file)
+        setRenameModalOpen(true)
+    }
+
+    const onRenameSubmit = async (newName: string) => {
+        if (!fileToRename) return
+
+        try {
+            await renameFile(drive, fileToRename.id, newName)
+            toast.success('File renamed successfully')
+            // Reload to reflect changes
+            setTimeout(() => window.location.reload(), 500)
+        } catch (error) {
+            console.error(error)
+            toast.error('Failed to rename file')
+            throw error // Re-throw for modal to handle loading state if needed
         }
     }
 
@@ -298,7 +307,7 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                                 <span
                                     title="Rename file"
                                     className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
-                                    onClick={() => handleRename(file)}
+                                    onClick={() => handleRenameClick(file)}
                                 >
                                     <FontAwesomeIcon icon="pen-to-square" />
                                 </span>
@@ -330,6 +339,13 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                     </div>
                 )
             })}
+            {/* Rename Modal */}
+            <RenameModal
+                isOpen={renameModalOpen}
+                onClose={() => setRenameModalOpen(false)}
+                onRename={onRenameSubmit}
+                currentName={fileToRename?.name || ''}
+            />
         </div>
     )
 }

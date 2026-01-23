@@ -4,6 +4,8 @@ import { getFileIcon, formatFileSize } from '../utils/fileIcons'
 import { parsePathInfo, getDownloadUrl, isFolder, renameFile } from '../utils/api'
 import type { DriveFile } from '../types'
 import toast from 'react-hot-toast'
+import { useState } from 'react'
+import RenameModal from './RenameModal'
 
 interface FileGridViewProps {
     files: DriveFile[]
@@ -13,6 +15,10 @@ interface FileGridViewProps {
 const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
     const location = useLocation()
     const { drive, path } = parsePathInfo(location.pathname)
+
+    // Rename state
+    const [renameModalOpen, setRenameModalOpen] = useState(false)
+    const [fileToRename, setFileToRename] = useState<DriveFile | null>(null)
 
     const getItemPath = (file: DriveFile): string => {
         const basePath = location.pathname.endsWith('/')
@@ -40,19 +46,23 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
         return a.name.localeCompare(b.name)
     })
 
-    const handleRename = async (file: DriveFile) => {
-        const newName = window.prompt('Enter new name:', file.name)
-        if (newName && newName !== file.name) {
-            const loadingToast = toast.loading('Renaming file...')
-            try {
-                await renameFile(drive, file.id, newName)
-                toast.success('File renamed successfully', { id: loadingToast })
-                // Reload to reflect changes
-                setTimeout(() => window.location.reload(), 500)
-            } catch (error) {
-                console.error(error)
-                toast.error('Failed to rename file', { id: loadingToast })
-            }
+    const handleRenameClick = (file: DriveFile) => {
+        setFileToRename(file)
+        setRenameModalOpen(true)
+    }
+
+    const onRenameSubmit = async (newName: string) => {
+        if (!fileToRename) return
+
+        try {
+            await renameFile(drive, fileToRename.id, newName)
+            toast.success('File renamed successfully')
+            // Reload to reflect changes
+            setTimeout(() => window.location.reload(), 500)
+        } catch (error) {
+            console.error(error)
+            toast.error('Failed to rename file')
+            throw error
         }
     }
 
@@ -116,7 +126,7 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                                     onClick={(e) => {
                                         e.preventDefault()
                                         e.stopPropagation()
-                                        handleRename(file)
+                                        handleRenameClick(file)
                                     }}
                                     className="rounded-full bg-white/90 p-2 text-gray-900 hover:bg-white"
                                     title="Rename"
@@ -142,6 +152,13 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                     </div>
                 </div>
             ))}
+            {/* Rename Modal */}
+            <RenameModal
+                isOpen={renameModalOpen}
+                onClose={() => setRenameModalOpen(false)}
+                onRename={onRenameSubmit}
+                currentName={fileToRename?.name || ''}
+            />
         </div>
     )
 }
