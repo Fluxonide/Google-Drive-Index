@@ -46,7 +46,7 @@ const Navbar = () => {
                             alt="Logo"
                             className="h-6 w-6"
                         />
-                        <span className="hidden font-semibold sm:inline">Google Drive Index</span>
+                        <span className="hidden font-semibold sm:inline">{(window as any).SITE_NAME || 'Google Drive Index'}</span>
                     </Link>
 
                     {/* Right side actions */}
