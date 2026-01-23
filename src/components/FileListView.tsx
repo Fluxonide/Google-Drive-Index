@@ -198,7 +198,7 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
         <div className="rounded bg-white shadow-sm dark:bg-[#18181B] dark:text-gray-100">
             {/* Header */}
             <div className="grid grid-cols-12 items-center gap-2 border-b border-gray-900/10 px-3 py-2 dark:border-gray-500/30">
-                <div className={`col-span-12 text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 ${showModified ? 'md:col-span-6' : 'md:col-span-9'}`}>
+                <div className={`col-span-12 text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 ${showModified ? 'md:col-span-4' : 'md:col-span-7'}`}>
                     Name
                 </div>
                 {showModified && (
@@ -212,7 +212,7 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                 <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
                     Actions
                 </div>
-                <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
+                <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block md:col-span-2">
                     {/* Bulk actions */}
                     <div className="flex items-center space-x-1 text-gray-700 dark:text-gray-400">
                         <Checkbox
@@ -253,9 +253,9 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                         {/* Name - clickable area */}
                         <Link
                             to={getItemPath(file)}
-                            className="col-span-12 md:col-span-10 grid grid-cols-10 items-center gap-2 px-3 py-2.5"
+                            className="col-span-12 md:col-span-9 grid grid-cols-9 items-center gap-2 px-3 py-2.5"
                         >
-                            <div className={`col-span-10 flex items-center space-x-2 truncate ${showModified ? 'md:col-span-6' : 'md:col-span-9'}`} title={file.name}>
+                            <div className={`col-span-9 flex items-center space-x-2 truncate ${showModified ? 'md:col-span-4' : 'md:col-span-7'}`} title={file.name}>
                                 <div className="w-5 flex-shrink-0 text-center">
                                     <FontAwesomeIcon
                                         icon={isFolderItem ? ['far', 'folder'] : getFileIcon(file.mimeType, file.fileExtension)}
@@ -316,7 +316,7 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                         </div>
 
                         {/* Checkbox column */}
-                        <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex">
+                        <div className="hidden p-1.5 text-gray-700 dark:text-gray-400 md:flex md:col-span-2">
                             {!isFolderItem && (
                                 <Checkbox
                                     checked={selected[file.id] ? 2 : 0}
