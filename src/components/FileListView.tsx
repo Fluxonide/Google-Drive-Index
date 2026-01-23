@@ -198,17 +198,19 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
         <div className="rounded bg-white shadow-sm dark:bg-[#18181B] dark:text-gray-100">
             {/* Header */}
             <div className="grid grid-cols-12 items-center gap-2 border-b border-gray-900/10 px-3 py-2 dark:border-gray-500/30">
-                <div className={`col-span-12 text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 ${showModified ? 'md:col-span-5' : 'md:col-span-9'}`}>
-                    Name
-                </div>
-                {showModified && (
-                    <div className="col-span-3 hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block">
-                        Last Modified
+                <div className={`col-span-12 flex items-center gap-2 ${showModified ? 'md:col-span-8' : 'md:col-span-9'}`}>
+                    <div className="flex-1 text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 truncate">
+                        Name
                     </div>
-                )}
+                    {showModified && (
+                        <div className="hidden w-[140px] flex-shrink-0 text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:block text-right">
+                            Last Modified
+                        </div>
+                    )}
+                </div>
                 <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:col-span-3 md:flex items-center justify-end gap-4 pr-3">
-                    <span>Size</span>
-                    <span className="w-[120px] text-center">Actions</span>
+                    <span className="w-[80px] text-center">Size</span>
+                    <span className="w-[150px] text-center">Actions</span>
                 </div>
                 <div className={`hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:col-span-1 ${showModified ? 'md:block' : 'hidden'}`}>
                     {/* Bulk actions */}
@@ -251,9 +253,9 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                         {/* Name - clickable area */}
                         <Link
                             to={getItemPath(file)}
-                            className={`col-span-12 grid items-center gap-2 px-3 py-2.5 ${showModified ? 'md:col-span-8 grid-cols-8' : 'md:col-span-9 grid-cols-9'}`}
+                            className={`col-span-12 flex items-center gap-2 px-3 py-2.5 ${showModified ? 'md:col-span-8' : 'md:col-span-9'}`}
                         >
-                            <div className={`col-span-9 flex items-center space-x-2 truncate ${showModified ? 'md:col-span-5' : 'md:col-span-9'}`} title={file.name}>
+                            <div className="flex-1 flex items-center space-x-2 truncate" title={file.name}>
                                 <div className="w-5 flex-shrink-0 text-center">
                                     <FontAwesomeIcon
                                         icon={isFolderItem ? ['far', 'folder'] : getFileIcon(file.mimeType, file.fileExtension)}
@@ -265,7 +267,7 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                                 </span>
                             </div>
                             {showModified && (
-                                <div className="col-span-3 hidden flex-shrink-0 font-mono text-sm text-gray-700 dark:text-gray-500 md:block">
+                                <div className="hidden w-[140px] flex-shrink-0 font-mono text-sm text-gray-700 dark:text-gray-500 md:block text-right">
                                     {formatDate(file.modifiedTime)}
                                 </div>
                             )}
@@ -273,10 +275,10 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
 
                         {/* Merged Size & Actions column */}
                         <div className="hidden md:col-span-3 md:flex items-center justify-end gap-4 pr-3">
-                            <div className="flex-shrink-0 font-mono text-sm text-gray-700 dark:text-gray-500 text-right">
+                            <div className="w-[80px] flex-shrink-0 font-mono text-sm text-gray-700 dark:text-gray-500 text-left">
                                 {isFolderItem ? '—' : formatFileSize(file.size)}
                             </div>
-                            <div className="flex items-center justify-end space-x-1 text-gray-700 dark:text-gray-400 w-[130px]">
+                            <div className="flex items-center justify-end space-x-1 text-gray-700 dark:text-gray-400 w-[150px]">
                                 {!isFolderItem && (
                                     <span
                                         title="Preview file"
