@@ -72,7 +72,7 @@ const Navbar = () => {
                             <span className="hidden text-sm md:inline">Search...</span>
                             <div className="hidden items-center space-x-1 md:flex">
                                 <kbd className="rounded bg-gray-200 px-1.5 py-0.5 text-xs font-medium dark:bg-gray-700">
-                                    ⌘
+                                    Ctrl
                                 </kbd>
                                 <kbd className="rounded bg-gray-200 px-1.5 py-0.5 text-xs font-medium dark:bg-gray-700">
                                     K
