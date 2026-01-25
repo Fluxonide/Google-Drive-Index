@@ -80,7 +80,18 @@ const Navbar = () => {
                             </div>
                         </button>
 
-                        {/* GitHub link */}
+
+                        {/* Logout button */}
+                        {(window as any).UI?.show_logout_button && (
+                            <a
+                                href="/logout"
+                                className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-red-500 dark:hover:bg-gray-800 dark:hover:text-red-400"
+                                title="Logout"
+                            >
+                                <FontAwesomeIcon icon="sign-out-alt" className="h-4 w-4" />
+                            </a>
+                        )}
+
                         <a
                             href="https://github.com/Fluxonide/Google-Drive-Index"
                             target="_blank"
