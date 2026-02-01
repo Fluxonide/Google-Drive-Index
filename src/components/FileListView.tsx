@@ -59,9 +59,10 @@ const Checkbox = ({ checked, onChange, title, indeterminate }: CheckboxProps) =>
 interface FileListViewProps {
     files: DriveFile[]
     onFileClick: (file: DriveFile) => void
+    onRenameSuccess?: (id: string, newName: string) => void
 }
 
-const FileListView = ({ files, onFileClick }: FileListViewProps) => {
+const FileListView = ({ files, onFileClick, onRenameSuccess }: FileListViewProps) => {
     const location = useLocation()
     const { drive, path } = parsePathInfo(location.pathname)
 
@@ -195,8 +196,12 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
         try {
             await renameFile(drive, fileToRename.id, newName)
             toast.success('File renamed successfully')
-            // Reload to reflect changes
-            setTimeout(() => window.location.reload(), 500)
+            // Optimistic update
+            if (onRenameSuccess) {
+                onRenameSuccess(fileToRename.id, newName)
+            } else {
+                setTimeout(() => window.location.reload(), 500)
+            }
         } catch (error) {
             console.error(error)
             toast.error('Failed to rename file')
