@@ -79,24 +79,22 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
         if (customPoster) {
             setIsValidatingPoster(true)
 
-            // Use fetch to check existence and get blob
-            // This is often faster and cleaner than new Image() for simple existence check
-            fetch(customPoster)
-                .then(async (res) => {
-                    if (res.ok) {
-                        // Found it! Use blob URL to avoid re-download
-                        const blob = await res.blob()
-                        const objUrl = URL.createObjectURL(blob)
-                        console.log('VideoPlayer: Custom poster found')
-                        setEffectivePoster(objUrl)
+            // Use simple fetch to check existence (HEAD or GET without body)
+            // This avoids waiting for full download if possible
+            fetch(customPoster, { method: 'HEAD' })
+                .then((res) => {
+                    if (res.ok && (res.status === 200 || res.status === 304)) {
+                        console.log('VideoPlayer: Custom poster found (HEAD)')
+                        setEffectivePoster(customPoster)
                     } else {
-                        // 404 or other error
-                        console.log('VideoPlayer: Custom poster 404/Error, using default')
+                        console.log('VideoPlayer: Custom poster HEAD failed/404, using default')
                         setEffectivePoster(poster || '')
                     }
                 })
                 .catch((err) => {
-                    console.log('VideoPlayer: Custom poster fetch error', err)
+                    console.log('VideoPlayer: Custom poster check error', err)
+                    // Fallback to GET just in case HEAD failed due to network/CORS but file exists?
+                    // No, user wants speed. Fail fast.
                     setEffectivePoster(poster || '')
                 })
                 .finally(() => {
