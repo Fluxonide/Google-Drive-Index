@@ -30,7 +30,7 @@ const FileHoverIcon = ({ file, isFolderItem, path, drive }: { file: DriveFile, i
             // Ensure path doesn't have double slashes
             let cleanPath = path === '/' ? '' : path
             if (cleanPath.endsWith('/')) {
-                cleanPath = cleanPath.slice(0, -1)
+                cleanPath = cleanPath.replace(/\/+$/, '')
             }
             // Format: /{drive}:/path/to/.thumbnail/file.jpg
             const customPath = `/${drive}:${cleanPath}/.thumbnail/${encodeURIComponent(rawName)}.jpg`
