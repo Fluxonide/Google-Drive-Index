@@ -117,6 +117,7 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                                                 downloadUrl={getFileDownloadUrl(file)}
                                                 fileName={file.name}
                                                 onRenameClick={() => handleRenameClick(file)}
+                                                color="white"
                                             />
                                         </div>
                                     </>
@@ -126,6 +127,7 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                                             downloadUrl={getFileDownloadUrl(file)}
                                             fileName={file.name}
                                             onRenameClick={() => handleRenameClick(file)}
+                                            color="white"
                                         />
                                     </div>
                                 )}
