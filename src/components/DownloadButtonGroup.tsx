@@ -10,6 +10,7 @@ interface DownloadButtonGroupProps {
     onRenameClick?: () => void
     color?: 'gray' | 'white'
     isFolder?: boolean
+    layout?: 'menu' | 'buttons'
 }
 
 const DownloadButtonGroup = ({
@@ -18,7 +19,8 @@ const DownloadButtonGroup = ({
     onCustomizeClick,
     onRenameClick,
     color = 'gray',
-    isFolder = false
+    isFolder = false,
+    layout = 'menu'
 }: DownloadButtonGroupProps) => {
     const copyToClipboard = (text: string) => {
         const successMsg = isFolder ? 'Copied folder link to clipboard!' : 'Copied direct link to clipboard!'
@@ -36,6 +38,49 @@ const DownloadButtonGroup = ({
     const buttonClass = color === 'white'
         ? "inline-flex w-full justify-center rounded-full p-2 text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75"
         : "inline-flex w-full justify-center rounded-full p-2 text-sm font-medium text-gray-500 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 dark:text-gray-400 dark:hover:bg-gray-800"
+
+    if (layout === 'buttons') {
+        const btnClass = "inline-flex items-center gap-2 rounded px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700"
+
+        return (
+            <div className="flex flex-wrap gap-2">
+                {!isFolder && (
+                    <button
+                        onClick={() => window.open(downloadUrl, '_blank')}
+                        className={`${btnClass} bg-indigo-600 text-white hover:bg-indigo-700 border-transparent dark:bg-indigo-600 dark:hover:bg-indigo-700`}
+                    >
+                        <FontAwesomeIcon icon="file-download" />
+                        Download
+                    </button>
+                )}
+                <button
+                    onClick={() => copyToClipboard(getFullUrl())}
+                    className={btnClass}
+                >
+                    <FontAwesomeIcon icon="copy" />
+                    {isFolder ? 'Copy Folder Link' : 'Copy Direct Link'}
+                </button>
+                {onCustomizeClick && (
+                    <button
+                        onClick={onCustomizeClick}
+                        className={btnClass}
+                    >
+                        <FontAwesomeIcon icon="pen" />
+                        Customize Link
+                    </button>
+                )}
+                {onRenameClick && (
+                    <button
+                        onClick={onRenameClick}
+                        className={btnClass}
+                    >
+                        <FontAwesomeIcon icon="edit" />
+                        Rename
+                    </button>
+                )}
+            </div>
+        )
+    }
 
     return (
         <Menu as="div" className="relative inline-block text-left">
