@@ -278,6 +278,41 @@ const FileListView = ({ files, onFileClick, onRenameSuccess }: FileListViewProps
         }
     }
 
+    // Helper to construct thumbnail path (extracted from FileHoverIcon to be reusable)
+    const getHoverThumbnailPath = (file: DriveFile, path: string, drive: number): string | null => {
+        if (!file.thumbnailLink) return null // Only check if file has a thumbnail link (reusing optimization from earlier)
+
+        const rawName = file.name.replace(/\.[^/.]+$/, "")
+        let cleanPath = path === '/' ? '' : path
+        if (cleanPath.endsWith('/')) {
+            cleanPath = cleanPath.replace(/\/+$/, '')
+        }
+        return `/${drive}:${cleanPath}/.thumbnail/${encodeURIComponent(rawName)}.jpg`
+    }
+
+    // Preload hover thumbnails
+    useEffect(() => {
+        const preloadThumbnails = async () => {
+            // Select candidates: not folders, and preferably have a thumbnail link to avoid mass 404s on generic files?
+            // User said "LOAD ALL".
+            // If I just loop all non-folders it should be fine.
+            const candidates = files.filter(f => !isFolder(f.mimeType))
+
+            for (const file of candidates) {
+                const src = getHoverThumbnailPath(file, path, drive)
+                if (src) {
+                    const img = new Image()
+                    img.src = src
+                    // We don't need to await this, just trigger the fetch
+                }
+            }
+        }
+
+        // Small delay to let the UI render first
+        const timer = setTimeout(preloadThumbnails, 1000)
+        return () => clearTimeout(timer)
+    }, [files, path, drive])
+
     return (
         <div className="rounded bg-white shadow-sm dark:bg-[#18181B] dark:text-gray-100">
             {/* Header */}
