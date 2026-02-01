@@ -17,6 +17,7 @@ export interface DriveFile {
     fileExtension?: string
     link?: string
     driveId?: string
+    thumbnailLink?: string
 }
 
 export interface FileListResponse {
@@ -79,7 +80,8 @@ export const MOCK_FILES: DriveFile[] = [
         name: 'Sample Image.jpg',
         mimeType: 'image/jpeg',
         size: '250000',
-        modifiedTime: new Date().toISOString()
+        modifiedTime: new Date().toISOString(),
+        thumbnailLink: 'https://images.unsplash.com/photo-1550258987-190a2d41a8ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80'
     },
     {
         id: 'audio1',
