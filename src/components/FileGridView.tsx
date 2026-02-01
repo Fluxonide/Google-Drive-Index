@@ -12,6 +12,8 @@ interface FileGridViewProps {
     onFileClick: (file: DriveFile) => void
 }
 
+import DownloadButtonGroup from './DownloadButtonGroup'
+
 const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
     const location = useLocation()
     const { drive, path } = parsePathInfo(location.pathname)
@@ -98,7 +100,7 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
 
                             {/* Hover overlay with actions */}
                             <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-                                {!isFolder(file.mimeType) && (
+                                {!isFolder(file.mimeType) ? (
                                     <>
                                         <button
                                             onClick={(e) => {
@@ -110,29 +112,23 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                                         >
                                             <FontAwesomeIcon icon="eye" className="h-4 w-4" />
                                         </button>
-                                        <a
-                                            href={getFileDownloadUrl(file)}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            onClick={(e) => e.stopPropagation()}
-                                            className="rounded-full bg-white/90 p-2 text-gray-900 hover:bg-white"
-                                            title="Download"
-                                        >
-                                            <FontAwesomeIcon icon="download" className="h-4 w-4" />
-                                        </a>
+                                        <div onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
+                                            <DownloadButtonGroup
+                                                downloadUrl={getFileDownloadUrl(file)}
+                                                fileName={file.name}
+                                                onRenameClick={() => handleRenameClick(file)}
+                                            />
+                                        </div>
                                     </>
+                                ) : (
+                                    <div onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
+                                        <DownloadButtonGroup
+                                            downloadUrl={getFileDownloadUrl(file)}
+                                            fileName={file.name}
+                                            onRenameClick={() => handleRenameClick(file)}
+                                        />
+                                    </div>
                                 )}
-                                <button
-                                    onClick={(e) => {
-                                        e.preventDefault()
-                                        e.stopPropagation()
-                                        handleRenameClick(file)
-                                    }}
-                                    className="rounded-full bg-white/90 p-2 text-gray-900 hover:bg-white"
-                                    title="Rename"
-                                >
-                                    <FontAwesomeIcon icon="pen-to-square" className="h-4 w-4" />
-                                </button>
                             </div>
                         </div>
                     </Link>
