@@ -1,4 +1,4 @@
-import { Fragment } from 'react'
+import { Fragment, useRef, useState } from 'react'
 import { Menu, Transition } from '@headlessui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import toast from 'react-hot-toast'
@@ -22,6 +22,21 @@ const DownloadButtonGroup = ({
     isFolder = false,
     layout = 'menu'
 }: DownloadButtonGroupProps) => {
+    const [menuPosition, setMenuPosition] = useState<'up' | 'down'>('down')
+    const buttonRef = useRef<HTMLButtonElement>(null)
+
+    const handleTriggerClick = () => {
+        if (buttonRef.current) {
+            const rect = buttonRef.current.getBoundingClientRect()
+            const spaceBelow = window.innerHeight - rect.bottom
+            if (spaceBelow < 250) {
+                setMenuPosition('up')
+            } else {
+                setMenuPosition('down')
+            }
+        }
+    }
+
     const copyToClipboard = (text: string) => {
         const successMsg = isFolder ? 'Copied folder link to clipboard!' : 'Copied direct link to clipboard!'
         navigator.clipboard.writeText(text).then(() => {
@@ -85,7 +100,7 @@ const DownloadButtonGroup = ({
     return (
         <Menu as="div" className="relative inline-block text-left">
             <div>
-                <Menu.Button className={buttonClass}>
+                <Menu.Button ref={buttonRef} onClick={handleTriggerClick} className={buttonClass}>
                     <FontAwesomeIcon icon="ellipsis-vertical" className="h-5 w-5 drop-shadow-sm" />
                 </Menu.Button>
             </div>
@@ -98,7 +113,7 @@ const DownloadButtonGroup = ({
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
             >
-                <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none dark:bg-[#18181B] dark:divide-gray-700 dark:ring-gray-700 z-50">
+                <Menu.Items className={`absolute right-0 w-48 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none dark:bg-[#18181B] dark:divide-gray-700 dark:ring-gray-700 z-50 ${menuPosition === 'up' ? 'bottom-full mb-2 origin-bottom-right' : 'mt-2 origin-top-right'}`}>
                     <div className="px-1 py-1">
                         {!isFolder && (
                             <Menu.Item>
