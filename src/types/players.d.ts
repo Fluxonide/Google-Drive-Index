@@ -1,5 +1,5 @@
 declare module 'dplayer-enhanced' {
-    interface DPlayerOptions {
+    interface VideoPlayerOptions {
         container: HTMLElement
         live?: boolean
         autoplay?: boolean
@@ -34,8 +34,8 @@ declare module 'dplayer-enhanced' {
         mutex?: boolean
     }
 
-    class DPlayer {
-        constructor(options: DPlayerOptions)
+    class VideoPlayer {
+        constructor(options: VideoPlayerOptions)
         play(): void
         pause(): void
         seek(time: number): void
@@ -51,7 +51,7 @@ declare module 'dplayer-enhanced' {
         paused: boolean
     }
 
-    export default DPlayer
+    export default VideoPlayer
 }
 
 declare module 'react-audio-player' {
