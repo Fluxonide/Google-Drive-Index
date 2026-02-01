@@ -12,6 +12,8 @@ import { MOCK_FILES } from '../../utils/api'
 import toast from 'react-hot-toast'
 import DownloadButtonGroup from '../DownloadButtonGroup'
 import CustomEmbedLinkMenu from '../CustomEmbedLinkMenu'
+import RenameFileModal from '../RenameFileModal'
+import { renameFile, parsePathInfo } from '../../utils/api'
 
 import VideoPlayer from './VideoPlayer'
 import AudioPlayer from './AudioPlayer'
@@ -29,6 +31,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
     const [fileData, setFileData] = useState<DriveFile | null>(file || null)
     const [loading, setLoading] = useState(!file)
     const [customizeOpen, setCustomizeOpen] = useState(false)
+    const [renameOpen, setRenameOpen] = useState(false)
 
     // If no file prop, fetch from current path
     useEffect(() => {
@@ -111,6 +114,29 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
             const pathParts = location.pathname.split('/').filter(Boolean)
             pathParts.pop()
             navigate('/' + pathParts.join('/') + '/')
+        }
+    }
+
+    const handleRename = async (newName: string) => {
+        if (!fileData || !fileData.id || fileData.id === 'temp') {
+            toast.error('Cannot rename file: Missing File ID (Try navigating from folder)')
+            return
+        }
+
+        try {
+            const { drive } = parsePathInfo(location.pathname)
+            await renameFile(drive, fileData.id, newName)
+
+            toast.success('File renamed successfully')
+            // Update local state
+            setFileData(prev => prev ? ({ ...prev, name: newName }) : null)
+
+            // Optionally update URL if needed, but that might cause reload loops
+            // For now just update the view
+        } catch (error: any) {
+            console.error('Rename failed:', error)
+            toast.error(error.message || 'Failed to rename file')
+            throw error // Re-throw for modal to handle if needed
         }
     }
 
@@ -271,6 +297,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                                 downloadUrl={downloadUrl}
                                 fileName={fileData?.name || 'file'}
                                 onCustomizeClick={() => setCustomizeOpen(true)}
+                                onRenameClick={fileData?.id && fileData.id !== 'temp' ? () => setRenameOpen(true) : undefined}
                             />
                         </div>
                     </div>
@@ -285,6 +312,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                             downloadUrl={downloadUrl}
                             fileName={fileData?.name || 'file'}
                             onCustomizeClick={() => setCustomizeOpen(true)}
+                            onRenameClick={fileData?.id && fileData.id !== 'temp' ? () => setRenameOpen(true) : undefined}
                         />
                     </DownloadBtnContainer>
                 </>
@@ -301,6 +329,12 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                     fileName={fileData?.name || 'file'}
                     menuOpen={customizeOpen}
                     setMenuOpen={setCustomizeOpen}
+                />
+                <RenameFileModal
+                    isOpen={renameOpen}
+                    fileName={fileData?.name || ''}
+                    onClose={() => setRenameOpen(false)}
+                    onRename={handleRename}
                 />
                 <Transition appear show={true} as={Fragment}>
                     <Dialog as="div" className="relative z-50" onClose={handleClose}>
@@ -359,6 +393,12 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                 fileName={fileData?.name || 'file'}
                 menuOpen={customizeOpen}
                 setMenuOpen={setCustomizeOpen}
+            />
+            <RenameFileModal
+                isOpen={renameOpen}
+                fileName={fileData?.name || ''}
+                onClose={() => setRenameOpen(false)}
+                onRename={handleRename}
             />
             <div className="mx-auto max-w-6xl px-4 py-4">
                 <div className="mb-4">
