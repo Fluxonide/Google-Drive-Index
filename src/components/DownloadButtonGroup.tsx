@@ -9,6 +9,7 @@ interface DownloadButtonGroupProps {
     onCustomizeClick?: () => void
     onRenameClick?: () => void
     color?: 'gray' | 'white'
+    isFolder?: boolean
 }
 
 const DownloadButtonGroup = ({
@@ -16,11 +17,13 @@ const DownloadButtonGroup = ({
     fileName,
     onCustomizeClick,
     onRenameClick,
-    color = 'gray'
+    color = 'gray',
+    isFolder = false
 }: DownloadButtonGroupProps) => {
     const copyToClipboard = (text: string) => {
+        const successMsg = isFolder ? 'Copied folder link to clipboard!' : 'Copied direct link to clipboard!'
         navigator.clipboard.writeText(text).then(() => {
-            toast.success('Copied direct link to clipboard!')
+            toast.success(successMsg)
         }).catch(() => {
             toast.error('Failed to copy link')
         })
@@ -52,18 +55,20 @@ const DownloadButtonGroup = ({
             >
                 <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none dark:bg-[#18181B] dark:divide-gray-700 dark:ring-gray-700 z-50">
                     <div className="px-1 py-1">
-                        <Menu.Item>
-                            {({ active }) => (
-                                <button
-                                    onClick={() => window.open(downloadUrl, '_blank')}
-                                    className={`${active ? 'bg-indigo-500 text-white' : 'text-gray-900 dark:text-gray-100'
-                                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
-                                >
-                                    <FontAwesomeIcon icon="file-download" className="mr-2 h-4 w-4" />
-                                    Download
-                                </button>
-                            )}
-                        </Menu.Item>
+                        {!isFolder && (
+                            <Menu.Item>
+                                {({ active }) => (
+                                    <button
+                                        onClick={() => window.open(downloadUrl, '_blank')}
+                                        className={`${active ? 'bg-indigo-500 text-white' : 'text-gray-900 dark:text-gray-100'
+                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                    >
+                                        <FontAwesomeIcon icon="file-download" className="mr-2 h-4 w-4" />
+                                        Download
+                                    </button>
+                                )}
+                            </Menu.Item>
+                        )}
                         <Menu.Item>
                             {({ active }) => (
                                 <button
@@ -72,7 +77,7 @@ const DownloadButtonGroup = ({
                                         } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                                 >
                                     <FontAwesomeIcon icon="copy" className="mr-2 h-4 w-4" />
-                                    Copy Direct Link
+                                    {isFolder ? 'Copy Folder Link' : 'Copy Direct Link'}
                                 </button>
                             )}
                         </Menu.Item>
