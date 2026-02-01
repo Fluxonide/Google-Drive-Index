@@ -109,7 +109,7 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
                         pic: effectivePoster,
                         type: 'auto',
                     },
-                    autoplay: true,
+                    autoplay: false,
                     theme: '#6366f1', // Indigo theme color
                     loop: false,
                     lang: 'en',
