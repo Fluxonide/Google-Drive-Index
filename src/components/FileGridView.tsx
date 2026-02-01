@@ -87,22 +87,28 @@ const FileGridView = ({ files, onFileClick, onRenameSuccess }: FileGridViewProps
                         className="block"
                     >
                         <div className="relative aspect-square overflow-hidden rounded-t-lg bg-gray-100 dark:bg-[#18181B]">
-                            {isImage(file) ? (
+                            {file.thumbnailLink || isImage(file) ? (
                                 <img
-                                    src={getFileDownloadUrl(file)}
+                                    src={file.thumbnailLink || getFileDownloadUrl(file)}
                                     alt={file.name}
                                     className="h-full w-full object-cover"
                                     loading="lazy"
+                                    referrerPolicy="no-referrer"
+                                    onError={(e) => {
+                                        // Fallback to icon if thumbnail fails to load
+                                        e.currentTarget.style.display = 'none'
+                                        e.currentTarget.parentElement?.querySelector('.fallback-icon')?.classList.remove('hidden')
+                                    }}
                                 />
-                            ) : (
-                                <div className="flex h-full w-full items-center justify-center">
-                                    <FontAwesomeIcon
-                                        icon={getFileIcon(file.mimeType, file.fileExtension)}
-                                        className={`h-12 w-12 ${isFolder(file.mimeType) ? 'text-gray-500' : 'text-gray-400'
-                                            }`}
-                                    />
-                                </div>
-                            )}
+                            ) : null}
+
+                            {/* Fallback Icon (initially hidden if we have a thumbnail/image) */}
+                            <div className={`fallback-icon flex h-full w-full items-center justify-center ${file.thumbnailLink || isImage(file) ? 'hidden' : ''}`}>
+                                <FontAwesomeIcon
+                                    icon={getFileIcon(file.mimeType, file.fileExtension)}
+                                    className={`h-12 w-12 ${isFolder(file.mimeType) ? 'text-gray-500' : 'text-gray-400'}`}
+                                />
+                            </div>
 
 
 
