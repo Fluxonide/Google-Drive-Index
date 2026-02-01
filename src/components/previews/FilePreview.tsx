@@ -152,7 +152,27 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
             // Construct new path
             const pathParts = location.pathname.split('/').filter(Boolean)
             pathParts[pathParts.length - 1] = encodeURIComponent(newName) // Replace filename
-            const newPath = '/' + pathParts.join('/') + '/'
+
+            // Reconstruct path, preserving original trailing slash if it existed (unlikely for files)
+            // But usually files don't have trailing slash.
+            let newPath = '/' + pathParts.join('/')
+            if (location.pathname.endsWith('/')) {
+                newPath += '/'
+            }
+
+            // If the original path had query params (like ?a=view), they are lost here if we just use pathname.
+            // But navigate(newPath) uses the path. 
+            // If we are in FilePreview, we might have ?a=view.
+            // Let's check if we should add ?a=view back? 
+            // The router probably handled ?a=view to get here.
+            // If we navigate to just the path, isFilePath checks pathname. 
+            // So queries are fine to drop or keep?
+            // Actually, FileGridView links to `${basePath}${name}?a=view`.
+            // So we should probably keep the search string if it exists.
+
+            if (location.search) {
+                newPath += location.search
+            }
 
             // Update URL without full reload, replacing current history entry
             navigate(newPath, { replace: true })
