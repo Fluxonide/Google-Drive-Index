@@ -1,52 +1,7 @@
-import { MouseEventHandler } from 'react'
+import { Fragment } from 'react'
+import { Menu, Transition } from '@headlessui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { IconProp } from '@fortawesome/fontawesome-svg-core'
 import toast from 'react-hot-toast'
-
-// Button style color mapping
-const btnStyleMap = (btnColor?: string) => {
-    const colorMap: Record<string, string> = {
-        gray: 'hover:text-gray-600 dark:hover:text-white focus:ring-gray-200 focus:text-gray-600 dark:focus:text-white border-gray-300 dark:border-gray-500 dark:focus:ring-gray-500',
-        blue: 'hover:text-blue-600 focus:ring-blue-200 focus:text-blue-600 border-blue-300 dark:border-blue-700 dark:focus:ring-blue-500',
-        teal: 'hover:text-teal-600 focus:ring-teal-200 focus:text-teal-600 border-teal-300 dark:border-teal-700 dark:focus:ring-teal-500',
-        red: 'hover:text-red-600 focus:ring-red-200 focus:text-red-600 border-red-300 dark:border-red-700 dark:focus:ring-red-500',
-        green: 'hover:text-green-600 focus:ring-green-200 focus:text-green-600 border-green-300 dark:border-green-700 dark:focus:ring-green-500',
-        pink: 'hover:text-pink-600 focus:ring-pink-200 focus:text-pink-600 border-pink-300 dark:border-pink-700 dark:focus:ring-pink-500',
-        yellow: 'hover:text-yellow-400 focus:ring-yellow-100 focus:text-yellow-400 border-yellow-300 dark:border-yellow-400 dark:focus:ring-yellow-300',
-        purple: 'hover:text-purple-600 focus:ring-purple-200 focus:text-purple-600 border-purple-300 dark:border-purple-700 dark:focus:ring-purple-500',
-    }
-    return btnColor ? colorMap[btnColor] || colorMap.gray : colorMap.gray
-}
-
-interface DownloadButtonProps {
-    onClickCallback: MouseEventHandler<HTMLButtonElement>
-    btnColor?: string
-    btnText: string
-    btnIcon?: IconProp
-    btnImage?: string
-    btnTitle?: string
-}
-
-export const DownloadButton = ({
-    onClickCallback,
-    btnColor,
-    btnText,
-    btnIcon,
-    btnImage,
-    btnTitle,
-}: DownloadButtonProps) => {
-    return (
-        <button
-            className={`flex items-center space-x-2 rounded-lg border bg-white py-2 px-4 text-sm font-medium text-gray-900 hover:bg-gray-100/10 focus:z-10 focus:ring-2 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-900 transition-all ${btnStyleMap(btnColor)}`}
-            title={btnTitle}
-            onClick={onClickCallback}
-        >
-            {btnIcon && <FontAwesomeIcon icon={btnIcon} />}
-            {btnImage && <img src={btnImage} alt={btnText} className="h-5 w-5" />}
-            <span>{btnText}</span>
-        </button>
-    )
-}
 
 interface DownloadButtonGroupProps {
     downloadUrl: string
@@ -69,40 +24,85 @@ const DownloadButtonGroup = ({ downloadUrl, fileName, onCustomizeClick, onRename
     }
 
     return (
-        <div className="flex flex-wrap justify-center gap-2">
-            <DownloadButton
-                onClickCallback={() => window.open(downloadUrl, '_blank')}
-                btnColor="blue"
-                btnText="Download"
-                btnIcon="file-download"
-                btnTitle="Download the file directly"
-            />
-            <DownloadButton
-                onClickCallback={() => copyToClipboard(getFullUrl())}
-                btnColor="pink"
-                btnText="Copy Direct Link"
-                btnIcon="copy"
-                btnTitle="Copy the direct link to clipboard"
-            />
-            {onCustomizeClick && (
-                <DownloadButton
-                    onClickCallback={onCustomizeClick}
-                    btnColor="teal"
-                    btnText="Customize Link"
-                    btnIcon="pen"
-                    btnTitle="Customize the download link"
-                />
-            )}
-            {onRenameClick && (
-                <DownloadButton
-                    onClickCallback={onRenameClick}
-                    btnColor="purple"
-                    btnText="Rename"
-                    btnIcon="edit"
-                    btnTitle="Rename file"
-                />
-            )}
-        </div>
+        <Menu as="div" className="relative inline-block text-left">
+            <div>
+                <Menu.Button className="inline-flex w-full justify-center rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700">
+                    <FontAwesomeIcon icon="ellipsis-vertical" className="mr-2 h-5 w-5" />
+                    Actions
+                    <FontAwesomeIcon icon="chevron-down" className="ml-2 -mr-1 h-5 w-5 text-violet-200 hover:text-violet-100" aria-hidden="true" />
+                </Menu.Button>
+            </div>
+            <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="transform opacity-0 scale-95"
+                enterTo="transform opacity-100 scale-100"
+                leave="transition ease-in duration-75"
+                leaveFrom="transform opacity-100 scale-100"
+                leaveTo="transform opacity-0 scale-95"
+            >
+                <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none dark:bg-[#18181B] dark:divide-gray-700 dark:ring-gray-700">
+                    <div className="px-1 py-1">
+                        <Menu.Item>
+                            {({ active }) => (
+                                <button
+                                    onClick={() => window.open(downloadUrl, '_blank')}
+                                    className={`${active ? 'bg-indigo-500 text-white' : 'text-gray-900 dark:text-gray-100'
+                                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                >
+                                    <FontAwesomeIcon icon="file-download" className="mr-2 h-4 w-4" />
+                                    Download
+                                </button>
+                            )}
+                        </Menu.Item>
+                        <Menu.Item>
+                            {({ active }) => (
+                                <button
+                                    onClick={() => copyToClipboard(getFullUrl())}
+                                    className={`${active ? 'bg-indigo-500 text-white' : 'text-gray-900 dark:text-gray-100'
+                                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                >
+                                    <FontAwesomeIcon icon="copy" className="mr-2 h-4 w-4" />
+                                    Copy Direct Link
+                                </button>
+                            )}
+                        </Menu.Item>
+                    </div>
+                    {(onCustomizeClick || onRenameClick) && (
+                        <div className="px-1 py-1">
+                            {onCustomizeClick && (
+                                <Menu.Item>
+                                    {({ active }) => (
+                                        <button
+                                            onClick={onCustomizeClick}
+                                            className={`${active ? 'bg-indigo-500 text-white' : 'text-gray-900 dark:text-gray-100'
+                                                } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                        >
+                                            <FontAwesomeIcon icon="pen" className="mr-2 h-4 w-4" />
+                                            Customize Link
+                                        </button>
+                                    )}
+                                </Menu.Item>
+                            )}
+                            {onRenameClick && (
+                                <Menu.Item>
+                                    {({ active }) => (
+                                        <button
+                                            onClick={onRenameClick}
+                                            className={`${active ? 'bg-indigo-500 text-white' : 'text-gray-900 dark:text-gray-100'
+                                                } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                        >
+                                            <FontAwesomeIcon icon="edit" className="mr-2 h-4 w-4" />
+                                            Rename
+                                        </button>
+                                    )}
+                                </Menu.Item>
+                            )}
+                        </div>
+                    )}
+                </Menu.Items>
+            </Transition>
+        </Menu>
     )
 }
 
