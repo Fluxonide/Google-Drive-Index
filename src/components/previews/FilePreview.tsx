@@ -244,28 +244,34 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
             // Custom thumbnail: /my-folder/.thumbnail/video.jpg
 
             let customPosterUrl = ''
-            // Only check for custom thumbnail if we already have a thumbnail link
-            // This prevents checking for files that definitely don't have thumbnails
-            if (fileData.thumbnailLink) {
-                try {
-                    // If downloadUrl is relative/absolute path starting with /
-                    if (downloadUrl.startsWith('/')) {
-                        const pathParts = downloadUrl.split('/')
-                        const fileName = pathParts.pop() // video.mp4
-                        if (fileName) {
-                            const rawName = fileName.substring(0, fileName.lastIndexOf('.')) || fileName // video
-                            // Convention: .thumbnail/video.jpg
-                            const thumbName = `${rawName}.jpg`
-                            customPosterUrl = `${pathParts.join('/')}/.thumbnail/${thumbName}`
-                        }
+            // Check for custom thumbnail: same path + /.thumbnail/ + filename + .jpg
+            // Example: /path/to/video.mp4 -> /path/to/.thumbnail/video.jpg
+
+            try {
+                // If downloadUrl is relative/absolute path starting with /
+                if (downloadUrl.startsWith('/')) {
+                    const pathParts = downloadUrl.split('/')
+                    const fileName = pathParts.pop() // video.mp4
+                    if (fileName) {
+                        const rawName = fileName.substring(0, fileName.lastIndexOf('.')) || fileName // video
+                        // Make sure to match the encoding logic from FileHoverIcon if needed
+                        // FileHoverIcon uses encodeURIComponent(rawName)
+                        // But here fileName comes from URL, so it might already be encoded.
+                        // Ideally we should use the same logic. 
+                        // If fileName is "my%20video.mp4", rawName="my%20video".
+                        // If actual file is "my video.jpg", we want "my%20video.jpg".
+                        // So reusing the rawName from URL seems correct for URL construction.
+
+                        const thumbName = `${rawName}.jpg`
+                        customPosterUrl = `${pathParts.join('/')}/.thumbnail/${thumbName}`
                     }
-                    // Using URL parsing if it's a full URL (less common for local proxy but possible)
-                    else if (downloadUrl.startsWith('http')) {
-                        // logic for full URL if needed, but for now assuming path-based routing
-                    }
-                } catch (e) {
-                    console.error("Error constructing custom poster URL", e)
                 }
+                // Using URL parsing if it's a full URL (less common for local proxy but possible)
+                else if (downloadUrl.startsWith('http')) {
+                    // logic for full URL if needed, but for now assuming path-based routing
+                }
+            } catch (e) {
+                console.error("Error constructing custom poster URL", e)
             }
 
             return (
