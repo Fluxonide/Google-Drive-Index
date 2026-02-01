@@ -22,8 +22,8 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
     const containerRef = useRef<HTMLDivElement>(null)
     const playerRef = useRef<any>(null)
 
-    const [effectivePoster, setEffectivePoster] = useState<string>('')
-    const [isValidatingPoster, setIsValidatingPoster] = useState<boolean>(!!customPoster)
+    // Initial poster is the default one provided
+    const [effectivePoster, setEffectivePoster] = useState<string>(poster || '')
     const [resourcesLoaded, setResourcesLoaded] = useState<boolean>(false)
 
     // Helper to load script and css
@@ -73,62 +73,57 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
         loadPlayerResources().then(() => setResourcesLoaded(true)).catch(console.error)
     }, [])
 
-    // Check custom poster
+    // Check custom poster in background and update running player
     useEffect(() => {
-        // If we have a custom poster URL, try to load it first
         if (customPoster) {
-            setIsValidatingPoster(true)
-
-            // Use simple fetch to check existence (HEAD or GET without body)
-            // This avoids waiting for full download if possible
+            console.log('VideoPlayer: Checking custom poster...', customPoster)
             fetch(customPoster, { method: 'HEAD' })
                 .then((res) => {
                     if (res.ok && (res.status === 200 || res.status === 304)) {
-                        console.log('VideoPlayer: Custom poster found (HEAD)')
+                        console.log('VideoPlayer: Custom poster found (HEAD)', customPoster)
                         setEffectivePoster(customPoster)
+
+                        // If player is already running, update the poster directly
+                        // to avoid re-initializing (flicker/reload)
+                        if (playerRef.current && playerRef.current.template && playerRef.current.template.poster) {
+                            playerRef.current.template.poster.style.backgroundImage = `url("${customPoster}")`
+                        }
                     } else {
-                        console.log('VideoPlayer: Custom poster HEAD failed/404, using default')
-                        setEffectivePoster(poster || '')
+                        // 404
                     }
                 })
-                .catch((err) => {
-                    console.log('VideoPlayer: Custom poster check error', err)
-                    // Fallback to GET just in case HEAD failed due to network/CORS but file exists?
-                    // No, user wants speed. Fail fast.
-                    setEffectivePoster(poster || '')
+                .catch((e) => {
+                    // Error
                 })
-                .finally(() => {
-                    setIsValidatingPoster(false)
-                })
-        } else {
-            setEffectivePoster(poster || '')
-            setIsValidatingPoster(false)
         }
-    }, [customPoster, poster])
+    }, [customPoster])
 
+    // Initialize Player
     useEffect(() => {
         let mounted = true
 
         const initPlayer = async () => {
             if (!containerRef.current) return
 
-            // Wait until resources are loaded AND poster is validated
-            if (!resourcesLoaded || isValidatingPoster) return
+            // Wait for resources only
+            if (!resourcesLoaded) return
 
             try {
                 if (!mounted) return
 
-                // If player already exists, destroy it
+                // If player already exists, destroy it ONLY if videoUrl changed
+                // We rely on the poster update effect to handle poster changes
                 if (playerRef.current) {
                     playerRef.current.destroy()
                 }
 
                 // Create VideoPlayer instance
+                console.log('VideoPlayer: Init with poster', effectivePoster || poster)
                 playerRef.current = new window.DPlayer({
                     container: containerRef.current,
                     video: {
                         url: videoUrl,
-                        pic: effectivePoster,
+                        pic: effectivePoster || poster || '',
                         type: 'auto',
                     },
                     autoplay: false,
@@ -161,16 +156,13 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
                 playerRef.current.destroy()
                 playerRef.current = null
             }
-            // Revoke object URL if we created one (simple optimization)
-            if (effectivePoster && effectivePoster.startsWith('blob:')) {
-                URL.revokeObjectURL(effectivePoster)
-            }
         }
-    }, [videoUrl, videoName, effectivePoster, isValidatingPoster, resourcesLoaded])
+        // Exclude effectivePoster from deps to prevent re-init on poster swap
+    }, [videoUrl, videoName, resourcesLoaded]) // Removed effectivePoster
 
     return (
         <div className="mx-auto aspect-video w-full max-h-[80vh] overflow-hidden rounded-lg bg-black relative">
-            {(!resourcesLoaded || isValidatingPoster) && (
+            {!resourcesLoaded && (
                 <div className="absolute inset-0 flex items-center justify-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
                 </div>
