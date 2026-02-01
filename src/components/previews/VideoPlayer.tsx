@@ -163,10 +163,13 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
     }, [videoUrl, videoName, effectivePoster, resourcesLoaded, isValidatingPoster])
 
     return (
-        <div className="mx-auto aspect-video w-full max-h-[80vh] overflow-hidden rounded-lg bg-black relative">
+        <div className="mx-auto aspect-video w-full max-h-[80vh] overflow-hidden rounded-lg bg-black relative group shadow-lg ring-1 ring-white/10">
             {(!resourcesLoaded || isValidatingPoster) && (
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-10">
+                    <div className="relative h-12 w-12">
+                        <div className="absolute inset-0 rounded-full border-4 border-white/20"></div>
+                        <div className="absolute inset-0 rounded-full border-4 border-t-white border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
+                    </div>
                 </div>
             )}
             <div ref={containerRef} className="h-full w-full" />
