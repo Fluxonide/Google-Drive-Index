@@ -7,6 +7,16 @@
     if (localStorage.theme === 'light') {
       document.documentElement.classList.remove('dark')
     }
+
+    // Mock configuration for local development
+    // This matches what worker.js injects in production
+    if (!window.UI) {
+      window.UI = {
+        player_js: "https://cdn.jsdelivr.net/npm/dplayer-enhanced@1.0.1/dist/DPlayer.min.js",
+        player_css: "https://cdn.jsdelivr.net/npm/dplayer-enhanced@1.0.1/dist/DPlayer.min.css",
+        show_logout_button: true
+      }
+    }
   </script>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />

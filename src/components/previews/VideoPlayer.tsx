@@ -23,11 +23,19 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster }) => {
 
     // Helper to load script and css
     const loadPlayerResources = async () => {
-        const playerJs = window.UI?.player_js || "https://cdn.jsdelivr.net/npm/dplayer-enhanced@1.2.0/dist/DPlayer.min.js"
-        const playerCss = window.UI?.player_css || "https://cdn.jsdelivr.net/npm/dplayer-enhanced@1.2.0/dist/DPlayer.min.css"
+        console.log('VideoPlayer: Loading resources...')
+        const playerJs = window.UI?.player_js
+        const playerCss = window.UI?.player_css
+        console.log('VideoPlayer: Config URLs:', { playerJs, playerCss })
+
+        if (!playerJs || !playerCss) {
+            console.error('DPlayer configuration missing in window.UI')
+            return
+        }
 
         // Load CSS
         if (!document.querySelector(`link[href="${playerCss}"]`)) {
+            console.log('VideoPlayer: Injecting CSS')
             const link = document.createElement('link')
             link.rel = 'stylesheet'
             link.href = playerCss
@@ -36,13 +44,22 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster }) => {
 
         // Load JS
         if (!window.DPlayer) {
+            console.log('VideoPlayer: Injecting JS')
             return new Promise<void>((resolve, reject) => {
                 const script = document.createElement('script')
                 script.src = playerJs
-                script.onload = () => resolve()
-                script.onerror = () => reject(new Error('Failed to load DPlayer'))
+                script.onload = () => {
+                    console.log('VideoPlayer: JS loaded successfully')
+                    resolve()
+                }
+                script.onerror = () => {
+                    console.error('VideoPlayer: Failed to load JS')
+                    reject(new Error('Failed to load DPlayer'))
+                }
                 document.body.appendChild(script)
             })
+        } else {
+             console.log('VideoPlayer: window.DPlayer already exists')
         }
     }
 
