@@ -27,7 +27,11 @@ const FileHoverIcon = ({ file, isFolderItem, path, drive }: { file: DriveFile, i
             // Construct custom thumbnail path matches FilePreview logic
             // Requires "drive:" prefix for worker routing
             const rawName = file.name.replace(/\.[^/.]+$/, "")
-            const cleanPath = path === '/' ? '' : path
+            // Ensure path doesn't have double slashes
+            let cleanPath = path === '/' ? '' : path
+            if (cleanPath.endsWith('/')) {
+                cleanPath = cleanPath.slice(0, -1)
+            }
             // Format: /{drive}:/path/to/.thumbnail/file.jpg
             const customPath = `/${drive}:${cleanPath}/.thumbnail/${encodeURIComponent(rawName)}.jpg`
             setImgSrc(customPath)
