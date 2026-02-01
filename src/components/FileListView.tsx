@@ -25,12 +25,12 @@ const FileHoverIcon = ({ file, isFolderItem, path }: { file: DriveFile, isFolder
         setIsHovering(true)
         if (!imgSrc) {
             // Construct custom thumbnail path
+            // Remove extension including the dot
             const rawName = file.name.replace(/\.[^/.]+$/, "")
             // Ensure path doesn't have double slashes
             const cleanPath = path === '/' ? '' : path
-            // Use encodeURIComponent for components, but typical file systems might need careful handling.
-            // Assuming the worker handles the path decoding.
-            const customPath = `${cleanPath}/.thumbnail/${rawName}.jpg`
+            // Use encodeURIComponent to support filenames with spaces/special chars
+            const customPath = `${cleanPath}/.thumbnail/${encodeURIComponent(rawName)}.jpg`
             setImgSrc(customPath)
         }
     }
