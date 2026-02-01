@@ -73,7 +73,8 @@ export const MOCK_FILES: DriveFile[] = [
         size: '150000000',
         modifiedTime: new Date().toISOString(),
         // Use a real external sample video for testing player
-        link: 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4'
+        link: 'https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_1MB.mp4',
+        thumbnailLink: 'https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=400&q=80'
     },
     {
         id: 'img1',
