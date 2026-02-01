@@ -56,21 +56,25 @@ const FileHoverIcon = ({ file, isFolderItem, path, drive }: { file: DriveFile, i
                 icon={isFolderItem ? ['far', 'folder'] : getFileIcon(file.mimeType, file.fileExtension)}
                 className={`h-4 w-4 ${isFolderItem ? 'text-gray-500' : 'text-gray-400'}`}
             />
-            {/* Hover Thumbnail */}
-            {!isFolderItem && isHovering && (
+            {/* Hover Thumbnail - Persisted in DOM to avoid reload flash */}
+            {!isFolderItem && (imgSrc || isHovering) && (
                 <div
-                    className="absolute left-6 top-1/2 -translate-y-1/2 z-[100] w-[220px] rounded-lg shadow-xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden bg-white dark:bg-gray-800 transition-all duration-200 origin-left"
-                    style={{ minHeight: '120px' }} // Min height to prevent collapse during load
+                    className={`absolute left-6 top-1/2 -translate-y-1/2 z-[100] w-[220px] rounded-lg shadow-xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden bg-white dark:bg-gray-800 transition-all duration-200 origin-left ${isHovering ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}
+                    style={{ minHeight: '120px' }}
                 >
-                    {imgSrc && (
+                    {imgSrc ? (
                         <img
                             src={imgSrc}
                             alt={file.name}
                             className="w-full h-auto object-cover"
                             onError={handleError}
                         />
+                    ) : (
+                        /* Loading state or empty */
+                        <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 min-h-[120px]">
+                            {/* Optional spinner could go here, but preloader makes it fast */}
+                        </div>
                     )}
-                    {/* Loading state if needed, or just blank bg */}
                 </div>
             )}
         </div>
