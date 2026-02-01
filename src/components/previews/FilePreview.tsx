@@ -47,7 +47,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                 const pathParts = location.pathname.split('/').filter(Boolean)
                 const fileName = decodeURIComponent(pathParts[pathParts.length - 1])
 
-                // Use mock data for local dev to ensure links work on refresh
+                // Use mock data for local dev
                 if (import.meta.env.DEV) {
                     const mockFile = MOCK_FILES.find(f => f.name === fileName)
                     if (mockFile) {
@@ -57,14 +57,34 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                     }
                 }
 
-                setFileData({
+                // Initial temp data to show something while fetching
+                const tempData: DriveFile = {
                     id: 'temp',
                     name: fileName,
                     mimeType: getMimeType(fileName),
                     size: undefined,
-                })
+                }
+                setFileData(tempData)
+
+                // Need to fetch properties from parent folder to get the ID
+                // Construct parent path
+                const { drive, path } = parsePathInfo(location.pathname)
+                const parentPath = path.substring(0, path.lastIndexOf(fileName))
+
+                // Fetch parent folder contents to find this file
+                // Import fetchFolderContents dynamically to avoid circular deps if any, 
+                // or just rely on the import at top
+                const { fetchFolderContents } = await import('../../utils/api')
+                const folderData = await fetchFolderContents(drive, parentPath)
+
+                const foundFile = folderData.data.files.find(f => f.name === fileName)
+
+                if (foundFile) {
+                    setFileData(foundFile)
+                }
             } catch (err) {
-                toast.error('Failed to load file')
+                console.error('Failed to load file details:', err)
+                toast.error('Failed to load file details')
             } finally {
                 setLoading(false)
             }
