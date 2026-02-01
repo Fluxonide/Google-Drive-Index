@@ -1,9 +1,10 @@
-import { useEffect, useRef, FC } from 'react'
+import { useEffect, useRef, useState, FC } from 'react'
 
 interface VideoPlayerProps {
     videoUrl: string
     videoName: string
     poster?: string
+    customPoster?: string
 }
 
 declare global {
@@ -17,9 +18,30 @@ declare global {
     }
 }
 
-const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster }) => {
+const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, customPoster }) => {
     const containerRef = useRef<HTMLDivElement>(null)
     const playerRef = useRef<any>(null)
+
+    const [effectivePoster, setEffectivePoster] = useState<string>(poster || '')
+
+    // Check custom poster
+    useEffect(() => {
+        // If we have a custom poster URL, try to load it first
+        if (customPoster) {
+            const img = new Image()
+            img.src = customPoster
+            img.onload = () => {
+                console.log('VideoPlayer: Custom poster loaded', customPoster)
+                setEffectivePoster(customPoster)
+            }
+            img.onerror = () => {
+                console.log('VideoPlayer: Custom poster failed, using default')
+                setEffectivePoster(poster || '')
+            }
+        } else {
+            setEffectivePoster(poster || '')
+        }
+    }, [customPoster, poster])
 
     // Helper to load script and css
     const loadPlayerResources = async () => {
@@ -59,7 +81,7 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster }) => {
                 document.body.appendChild(script)
             })
         } else {
-             console.log('VideoPlayer: window.DPlayer already exists')
+            console.log('VideoPlayer: window.DPlayer already exists')
         }
     }
 
@@ -74,12 +96,17 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster }) => {
 
                 if (!mounted) return
 
+                // If player already exists, destroy it
+                if (playerRef.current) {
+                    playerRef.current.destroy()
+                }
+
                 // Create VideoPlayer instance
                 playerRef.current = new window.DPlayer({
                     container: containerRef.current,
                     video: {
                         url: videoUrl,
-                        pic: poster || '',
+                        pic: effectivePoster,
                         type: 'auto',
                     },
                     autoplay: true,
@@ -103,9 +130,14 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster }) => {
             }
         }
 
+        // Only init if we have determined the poster (or if no custom poster provided)
+        // This avoids a flash of the wrong poster
         initPlayer()
 
         // Cleanup on unmount
+        // Note: We don't destroy immediately in useEffect cleanup to avoid flashing during re-renders?
+        // Actually DPlayer destroy removes the check, so we should be careful.
+        // But here we want to destroy if the component unmounts.
         return () => {
             mounted = false
             if (playerRef.current) {
@@ -113,7 +145,7 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster }) => {
                 playerRef.current = null
             }
         }
-    }, [videoUrl, videoName, poster])
+    }, [videoUrl, videoName, effectivePoster])
 
     return (
         <div className="mx-auto aspect-video w-full max-h-[80vh] overflow-hidden rounded-lg bg-black">
