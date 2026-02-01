@@ -26,8 +26,8 @@ const DownloadButtonGroup = ({ downloadUrl, fileName, onCustomizeClick, onRename
     return (
         <Menu as="div" className="relative inline-block text-left">
             <div>
-                <Menu.Button className="inline-flex w-full justify-center rounded-lg bg-gray-100 px-2 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700">
-                    <FontAwesomeIcon icon="ellipsis-vertical" className="h-5 w-5" />
+                <Menu.Button className="inline-flex w-full justify-center rounded-full p-2 text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75">
+                    <FontAwesomeIcon icon="ellipsis-vertical" className="h-5 w-5 drop-shadow-md" />
                 </Menu.Button>
             </div>
             <Transition
@@ -39,7 +39,7 @@ const DownloadButtonGroup = ({ downloadUrl, fileName, onCustomizeClick, onRename
                 leaveFrom="transform opacity-100 scale-100"
                 leaveTo="transform opacity-0 scale-95"
             >
-                <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none dark:bg-[#18181B] dark:divide-gray-700 dark:ring-gray-700">
+                <Menu.Items className="absolute right-0 mt-2 w-48 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none dark:bg-[#18181B] dark:divide-gray-700 dark:ring-gray-700 z-50">
                     <div className="px-1 py-1">
                         <Menu.Item>
                             {({ active }) => (
