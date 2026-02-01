@@ -64,7 +64,10 @@ const RenameModal = ({ isOpen, onClose, onRename, currentName }: RenameModalProp
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-[#18181B] dark:border dark:border-gray-700/50">
+                            <Dialog.Panel
+                                className="w-full max-w-md transform overflow-hidden rounded-lg bg-white p-6 text-left align-middle shadow-xl transition-all dark:bg-[#18181B] dark:border dark:border-gray-700/50"
+                                onClick={(e) => e.stopPropagation()}
+                            >
                                 <Dialog.Title
                                     as="h3"
                                     className="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100 flex items-center gap-2"
