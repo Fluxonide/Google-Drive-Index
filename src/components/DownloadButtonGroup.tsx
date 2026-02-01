@@ -52,9 +52,10 @@ interface DownloadButtonGroupProps {
     downloadUrl: string
     fileName: string
     onCustomizeClick?: () => void
+    onRenameClick?: () => void
 }
 
-const DownloadButtonGroup = ({ downloadUrl, fileName, onCustomizeClick }: DownloadButtonGroupProps) => {
+const DownloadButtonGroup = ({ downloadUrl, fileName, onCustomizeClick, onRenameClick }: DownloadButtonGroupProps) => {
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text).then(() => {
             toast.success('Copied direct link to clipboard!')
@@ -90,6 +91,15 @@ const DownloadButtonGroup = ({ downloadUrl, fileName, onCustomizeClick }: Downlo
                     btnText="Customize Link"
                     btnIcon="pen"
                     btnTitle="Customize the download link"
+                />
+            )}
+            {onRenameClick && (
+                <DownloadButton
+                    onClickCallback={onRenameClick}
+                    btnColor="purple"
+                    btnText="Rename"
+                    btnIcon="edit"
+                    btnTitle="Rename file"
                 />
             )}
         </div>
