@@ -303,6 +303,7 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                                         downloadUrl={getFileDownloadUrl(file)}
                                         fileName={file.name}
                                         onRenameClick={() => handleRenameClick(file)}
+                                        isFolder={isFolderItem}
                                     />
                                 </div>
                             </div>
