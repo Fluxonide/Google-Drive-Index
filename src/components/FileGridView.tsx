@@ -10,11 +10,12 @@ import RenameModal from './RenameModal'
 interface FileGridViewProps {
     files: DriveFile[]
     onFileClick: (file: DriveFile) => void
+    onRenameSuccess?: (id: string, newName: string) => void
 }
 
 import DownloadButtonGroup from './DownloadButtonGroup'
 
-const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
+const FileGridView = ({ files, onFileClick, onRenameSuccess }: FileGridViewProps) => {
     const location = useLocation()
     const { drive, path } = parsePathInfo(location.pathname)
 
@@ -59,8 +60,13 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
         try {
             await renameFile(drive, fileToRename.id, newName)
             toast.success('File renamed successfully')
-            // Reload to reflect changes
-            setTimeout(() => window.location.reload(), 500)
+            // Optimistic update
+            if (onRenameSuccess) {
+                onRenameSuccess(fileToRename.id, newName)
+            } else {
+                // Fallback if no callback provided
+                setTimeout(() => window.location.reload(), 500)
+            }
         } catch (error) {
             console.error(error)
             toast.error('Failed to rename file')
