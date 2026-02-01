@@ -9,7 +9,7 @@ import RenameModal from './RenameModal'
 import DownloadButtonGroup from './DownloadButtonGroup'
 
 // Helper component for icon with hover thumbnail
-const FileHoverIcon = ({ file, isFolderItem, path }: { file: DriveFile, isFolderItem: boolean, path: string }) => {
+const FileHoverIcon = ({ file, isFolderItem, path, drive }: { file: DriveFile, isFolderItem: boolean, path: string, drive: number }) => {
     const [isHovering, setIsHovering] = useState(false)
     const [imgSrc, setImgSrc] = useState<string>('')
     const [hasError, setHasError] = useState(false)
@@ -19,18 +19,17 @@ const FileHoverIcon = ({ file, isFolderItem, path }: { file: DriveFile, isFolder
         setIsHovering(false)
         setHasError(false)
         setImgSrc('')
-    }, [file.id, path])
+    }, [file.id, path, drive])
 
     const handleMouseEnter = () => {
         setIsHovering(true)
         if (!imgSrc) {
-            // Construct custom thumbnail path
-            // Remove extension including the dot
+            // Construct custom thumbnail path matches FilePreview logic
+            // Requires "drive:" prefix for worker routing
             const rawName = file.name.replace(/\.[^/.]+$/, "")
-            // Ensure path doesn't have double slashes
             const cleanPath = path === '/' ? '' : path
-            // Use encodeURIComponent to support filenames with spaces/special chars
-            const customPath = `${cleanPath}/.thumbnail/${encodeURIComponent(rawName)}.jpg`
+            // Format: /{drive}:/path/to/.thumbnail/file.jpg
+            const customPath = `/${drive}:${cleanPath}/.thumbnail/${encodeURIComponent(rawName)}.jpg`
             setImgSrc(customPath)
         }
     }
@@ -337,7 +336,7 @@ const FileListView = ({ files, onFileClick, onRenameSuccess }: FileListViewProps
                             className={`col-span-12 flex items-center gap-2 px-3 py-2.5 ${showModified ? 'md:col-span-8' : 'md:col-span-9'}`}
                         >
                             <div className="flex-1 flex items-center space-x-2 min-w-0">
-                                <FileHoverIcon file={file} isFolderItem={isFolderItem} path={path} />
+                                <FileHoverIcon file={file} isFolderItem={isFolderItem} path={path} drive={drive} />
                                 <span className="truncate font-medium text-gray-900 dark:text-white" title={file.name}>
                                     {file.name}
                                 </span>
