@@ -148,11 +148,19 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
             await renameFile(drive, fileData.id, newName)
 
             toast.success('File renamed successfully')
-            // Update local state
+
+            // Construct new path
+            const pathParts = location.pathname.split('/').filter(Boolean)
+            pathParts[pathParts.length - 1] = encodeURIComponent(newName) // Replace filename
+            const newPath = '/' + pathParts.join('/') + '/'
+
+            // Update URL without full reload, replacing current history entry
+            navigate(newPath, { replace: true })
+
+            // Update local state - useEffect will likely fire due to location change, 
+            // but setting state here gives immediate feedback
             setFileData(prev => prev ? ({ ...prev, name: newName }) : null)
 
-            // Optionally update URL if needed, but that might cause reload loops
-            // For now just update the view
         } catch (error: any) {
             console.error('Rename failed:', error)
             toast.error(error.message || 'Failed to rename file')
