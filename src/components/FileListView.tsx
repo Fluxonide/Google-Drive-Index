@@ -6,6 +6,7 @@ import { parsePathInfo, getDownloadUrl, isFolder, renameFile } from '../utils/ap
 import type { DriveFile } from '../types'
 import toast from 'react-hot-toast'
 import RenameModal from './RenameModal'
+import DownloadButtonGroup from './DownloadButtonGroup'
 
 // Checkbox component with indeterminate state support
 interface CheckboxProps {
@@ -297,32 +298,13 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                                         <FontAwesomeIcon icon="eye" />
                                     </span>
                                 )}
-                                <span
-                                    title={isFolderItem ? 'Copy folder link' : 'Copy file link'}
-                                    className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
-                                    onClick={() => copyFileLink(file)}
-                                >
-                                    <FontAwesomeIcon icon={['far', 'copy']} />
-                                </span>
-                                <span
-                                    title="Rename file"
-                                    className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
-                                    onClick={() => handleRenameClick(file)}
-                                >
-                                    <FontAwesomeIcon icon="pen-to-square" />
-                                </span>
-                                {!isFolderItem && (
-                                    <a
-                                        title="Download file"
-                                        className="cursor-pointer rounded px-1.5 py-1 hover:bg-gray-300 dark:hover:bg-gray-600"
-                                        href={getFileDownloadUrl(file)}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <FontAwesomeIcon icon={['far', 'circle-down']} />
-                                    </a>
-                                )}
+                                <div onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
+                                    <DownloadButtonGroup
+                                        downloadUrl={getFileDownloadUrl(file)}
+                                        fileName={file.name}
+                                        onRenameClick={() => handleRenameClick(file)}
+                                    />
+                                </div>
                             </div>
                         </div>
 
