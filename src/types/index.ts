@@ -10,6 +10,7 @@ export interface DriveFile {
     fileExtension?: string
     link?: string
     driveId?: string
+    thumbnailLink?: string
 }
 
 export interface FolderListResponse {
