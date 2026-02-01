@@ -23,7 +23,7 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
     const playerRef = useRef<any>(null)
 
     // Initial poster is the default one provided
-    const [effectivePoster, setEffectivePoster] = useState<string>('')
+    const [effectivePoster, setEffectivePoster] = useState<string>(poster || '')
     const [isValidatingPoster, setIsValidatingPoster] = useState<boolean>(!!customPoster)
     const [resourcesLoaded, setResourcesLoaded] = useState<boolean>(false)
 
@@ -86,12 +86,15 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
                         setEffectivePoster(customPoster)
                     } else {
                         console.log('VideoPlayer: Custom poster HEAD failed/404, using default')
-                        setEffectivePoster(poster || '')
+                        // No need to reset if it's already poster (default)
+                        // But if prop changed, effectivePoster would be stale?
+                        // Actually validation usually happens on mount or prop change.
+                        // If we are VALIDATING, effectivePoster is currently 'poster'.
+                        // So if we fail, we just keep it as 'poster'.
                     }
                 })
                 .catch((e) => {
                     console.log('VideoPlayer: Custom poster check error', e)
-                    setEffectivePoster(poster || '')
                 })
                 .finally(() => {
                     setIsValidatingPoster(false)
@@ -109,8 +112,8 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
         const initPlayer = async () => {
             if (!containerRef.current) return
 
-            // Wait for resources AND validation
-            if (!resourcesLoaded || isValidatingPoster) return
+            // Wait for resources ONLY. Do NOT wait for validation.
+            if (!resourcesLoaded) return
 
             try {
                 if (!mounted) return
@@ -160,11 +163,11 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
                 playerRef.current = null
             }
         }
-    }, [videoUrl, videoName, effectivePoster, resourcesLoaded, isValidatingPoster])
+    }, [videoUrl, videoName, effectivePoster, resourcesLoaded]) // Removed isValidatingPoster dependency
 
     return (
         <div className="mx-auto aspect-video w-full max-h-[80vh] overflow-hidden rounded-lg bg-black relative group shadow-lg ring-1 ring-white/10">
-            {(!resourcesLoaded || isValidatingPoster) && (
+            {(!resourcesLoaded) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-10">
                     <div className="relative h-12 w-12">
                         <div className="absolute inset-0 rounded-full border-4 border-white/20"></div>
