@@ -8,9 +8,16 @@ interface DownloadButtonGroupProps {
     fileName: string
     onCustomizeClick?: () => void
     onRenameClick?: () => void
+    color?: 'gray' | 'white'
 }
 
-const DownloadButtonGroup = ({ downloadUrl, fileName, onCustomizeClick, onRenameClick }: DownloadButtonGroupProps) => {
+const DownloadButtonGroup = ({
+    downloadUrl,
+    fileName,
+    onCustomizeClick,
+    onRenameClick,
+    color = 'gray'
+}: DownloadButtonGroupProps) => {
     const copyToClipboard = (text: string) => {
         navigator.clipboard.writeText(text).then(() => {
             toast.success('Copied direct link to clipboard!')
@@ -23,11 +30,15 @@ const DownloadButtonGroup = ({ downloadUrl, fileName, onCustomizeClick, onRename
         return `${window.location.origin}${downloadUrl}`
     }
 
+    const buttonClass = color === 'white'
+        ? "inline-flex w-full justify-center rounded-full p-2 text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75"
+        : "inline-flex w-full justify-center rounded-full p-2 text-sm font-medium text-gray-500 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 dark:text-gray-400 dark:hover:bg-gray-800"
+
     return (
         <Menu as="div" className="relative inline-block text-left">
             <div>
-                <Menu.Button className="inline-flex w-full justify-center rounded-full p-2 text-sm font-medium text-white hover:bg-white/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75">
-                    <FontAwesomeIcon icon="ellipsis-vertical" className="h-5 w-5 drop-shadow-md" />
+                <Menu.Button className={buttonClass}>
+                    <FontAwesomeIcon icon="ellipsis-vertical" className="h-5 w-5 drop-shadow-sm" />
                 </Menu.Button>
             </div>
             <Transition
