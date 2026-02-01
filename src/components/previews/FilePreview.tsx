@@ -244,24 +244,28 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
             // Custom thumbnail: /my-folder/.thumbnail/video.jpg
 
             let customPosterUrl = ''
-            try {
-                // If downloadUrl is relative/absolute path starting with /
-                if (downloadUrl.startsWith('/')) {
-                    const pathParts = downloadUrl.split('/')
-                    const fileName = pathParts.pop() // video.mp4
-                    if (fileName) {
-                        const rawName = fileName.substring(0, fileName.lastIndexOf('.')) || fileName // video
-                        // Convention: .thumbnail/video.jpg
-                        const thumbName = `${rawName}.jpg`
-                        customPosterUrl = `${pathParts.join('/')}/.thumbnail/${thumbName}`
+            // Only check for custom thumbnail if we already have a thumbnail link
+            // This prevents checking for files that definitely don't have thumbnails
+            if (fileData.thumbnailLink) {
+                try {
+                    // If downloadUrl is relative/absolute path starting with /
+                    if (downloadUrl.startsWith('/')) {
+                        const pathParts = downloadUrl.split('/')
+                        const fileName = pathParts.pop() // video.mp4
+                        if (fileName) {
+                            const rawName = fileName.substring(0, fileName.lastIndexOf('.')) || fileName // video
+                            // Convention: .thumbnail/video.jpg
+                            const thumbName = `${rawName}.jpg`
+                            customPosterUrl = `${pathParts.join('/')}/.thumbnail/${thumbName}`
+                        }
                     }
+                    // Using URL parsing if it's a full URL (less common for local proxy but possible)
+                    else if (downloadUrl.startsWith('http')) {
+                        // logic for full URL if needed, but for now assuming path-based routing
+                    }
+                } catch (e) {
+                    console.error("Error constructing custom poster URL", e)
                 }
-                // Using URL parsing if it's a full URL (less common for local proxy but possible)
-                else if (downloadUrl.startsWith('http')) {
-                    // logic for full URL if needed, but for now assuming path-based routing
-                }
-            } catch (e) {
-                console.error("Error constructing custom poster URL", e)
             }
 
             return (
