@@ -1,5 +1,5 @@
 import { useEffect, useRef, FC } from 'react'
-import DPlayer from 'dplayer-enhanced'
+import VideoPlayerLib from 'dplayer-enhanced'
 
 interface VideoPlayerProps {
     videoUrl: string
@@ -14,8 +14,8 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster }) => {
     useEffect(() => {
         if (!containerRef.current) return
 
-        // Create DPlayer instance
-        playerRef.current = new DPlayer({
+        // Create VideoPlayer instance
+        playerRef.current = new VideoPlayerLib({
             container: containerRef.current,
             video: {
                 url: videoUrl,
