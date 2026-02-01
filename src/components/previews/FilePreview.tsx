@@ -12,7 +12,7 @@ import { MOCK_FILES } from '../../utils/api'
 import toast from 'react-hot-toast'
 import DownloadButtonGroup from '../DownloadButtonGroup'
 import CustomEmbedLinkMenu from '../CustomEmbedLinkMenu'
-import RenameFileModal from '../RenameFileModal'
+import RenameModal from '../RenameModal'
 import { renameFile, parsePathInfo } from '../../utils/api'
 
 import VideoPlayer from './VideoPlayer'
@@ -330,9 +330,9 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                     menuOpen={customizeOpen}
                     setMenuOpen={setCustomizeOpen}
                 />
-                <RenameFileModal
+                <RenameModal
                     isOpen={renameOpen}
-                    fileName={fileData?.name || ''}
+                    currentName={fileData?.name || ''}
                     onClose={() => setRenameOpen(false)}
                     onRename={handleRename}
                 />
@@ -394,9 +394,9 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                 menuOpen={customizeOpen}
                 setMenuOpen={setCustomizeOpen}
             />
-            <RenameFileModal
+            <RenameModal
                 isOpen={renameOpen}
-                fileName={fileData?.name || ''}
+                currentName={fileData?.name || ''}
                 onClose={() => setRenameOpen(false)}
                 onRename={handleRename}
             />
