@@ -62,7 +62,7 @@ const DownloadButtonGroup = ({
                 {!isFolder && (
                     <button
                         onClick={() => window.open(downloadUrl, '_blank')}
-                        className={`${btnClass} bg-indigo-600 text-white hover:bg-indigo-700 border-transparent dark:bg-indigo-600 dark:hover:bg-indigo-700`}
+                        className={`${btnClass} bg-gray-900 text-white hover:bg-black border-transparent dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200`}
                     >
                         <FontAwesomeIcon icon="file-download" />
                         Download
@@ -120,8 +120,8 @@ const DownloadButtonGroup = ({
                                 {({ active }) => (
                                     <button
                                         onClick={() => window.open(downloadUrl, '_blank')}
-                                        className={`${active ? 'bg-indigo-500 text-white' : 'text-gray-900 dark:text-gray-100'
-                                            } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                        className={`${active ? 'bg-gray-100 dark:bg-gray-700' : ''
+                                            } text-gray-900 dark:text-gray-100 group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                                     >
                                         <FontAwesomeIcon icon="file-download" className="mr-2 h-4 w-4" />
                                         Download
@@ -133,8 +133,8 @@ const DownloadButtonGroup = ({
                             {({ active }) => (
                                 <button
                                     onClick={() => copyToClipboard(getFullUrl())}
-                                    className={`${active ? 'bg-indigo-500 text-white' : 'text-gray-900 dark:text-gray-100'
-                                        } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                    className={`${active ? 'bg-gray-100 dark:bg-gray-700' : ''
+                                        } text-gray-900 dark:text-gray-100 group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                                 >
                                     <FontAwesomeIcon icon="copy" className="mr-2 h-4 w-4" />
                                     {isFolder ? 'Copy Folder Link' : 'Copy Direct Link'}
@@ -149,8 +149,8 @@ const DownloadButtonGroup = ({
                                     {({ active }) => (
                                         <button
                                             onClick={onCustomizeClick}
-                                            className={`${active ? 'bg-indigo-500 text-white' : 'text-gray-900 dark:text-gray-100'
-                                                } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                            className={`${active ? 'bg-gray-100 dark:bg-gray-700' : ''
+                                                } text-gray-900 dark:text-gray-100 group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                                         >
                                             <FontAwesomeIcon icon="pen" className="mr-2 h-4 w-4" />
                                             Customize Link
@@ -163,8 +163,8 @@ const DownloadButtonGroup = ({
                                     {({ active }) => (
                                         <button
                                             onClick={onRenameClick}
-                                            className={`${active ? 'bg-indigo-500 text-white' : 'text-gray-900 dark:text-gray-100'
-                                                } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                            className={`${active ? 'bg-gray-100 dark:bg-gray-700' : ''
+                                                } text-gray-900 dark:text-gray-100 group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                                         >
                                             <FontAwesomeIcon icon="edit" className="mr-2 h-4 w-4" />
                                             Rename
