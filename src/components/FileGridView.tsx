@@ -128,6 +128,7 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                                             fileName={file.name}
                                             onRenameClick={() => handleRenameClick(file)}
                                             color="white"
+                                            isFolder={true}
                                         />
                                     </div>
                                 )}
