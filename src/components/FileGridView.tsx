@@ -98,39 +98,30 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                                 </div>
                             )}
 
-                            {/* Hover overlay with actions */}
+                            {/* Always visible Actions Menu */}
+                            <div className="absolute top-2 right-2 z-10" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
+                                <DownloadButtonGroup
+                                    downloadUrl={getFileDownloadUrl(file)}
+                                    fileName={file.name}
+                                    onRenameClick={() => handleRenameClick(file)}
+                                    color="white"
+                                    isFolder={isFolder(file.mimeType)}
+                                />
+                            </div>
+
+                            {/* Hover overlay with Preview only */}
                             <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-                                {!isFolder(file.mimeType) ? (
-                                    <>
-                                        <button
-                                            onClick={(e) => {
-                                                e.preventDefault()
-                                                onFileClick(file)
-                                            }}
-                                            className="rounded-full bg-white/90 p-2 text-gray-900 hover:bg-white"
-                                            title="Preview"
-                                        >
-                                            <FontAwesomeIcon icon="eye" className="h-4 w-4" />
-                                        </button>
-                                        <div onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
-                                            <DownloadButtonGroup
-                                                downloadUrl={getFileDownloadUrl(file)}
-                                                fileName={file.name}
-                                                onRenameClick={() => handleRenameClick(file)}
-                                                color="white"
-                                            />
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
-                                        <DownloadButtonGroup
-                                            downloadUrl={getFileDownloadUrl(file)}
-                                            fileName={file.name}
-                                            onRenameClick={() => handleRenameClick(file)}
-                                            color="white"
-                                            isFolder={true}
-                                        />
-                                    </div>
+                                {!isFolder(file.mimeType) && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault()
+                                            onFileClick(file)
+                                        }}
+                                        className="rounded-full bg-white/90 p-2 text-gray-900 hover:bg-white"
+                                        title="Preview"
+                                    >
+                                        <FontAwesomeIcon icon="eye" className="h-4 w-4" />
+                                    </button>
                                 )}
                             </div>
                         </div>
