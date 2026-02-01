@@ -220,7 +220,7 @@ const FileListView = ({ files, onFileClick }: FileListViewProps) => {
                 </div>
                 <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:col-span-3 md:flex items-center justify-end gap-4 pr-3">
                     <span className="w-[80px] text-center">Size</span>
-                    <span className="w-[150px] text-center">Actions</span>
+                    <span className="w-[150px] text-right">Actions</span>
                 </div>
                 <div className={`hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:col-span-1 ${showModified ? 'md:block' : 'hidden'}`}>
                     {/* Bulk actions */}
