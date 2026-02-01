@@ -270,12 +270,23 @@ const FileListView = ({ files, onFileClick, onRenameSuccess }: FileListViewProps
                             to={getItemPath(file)}
                             className={`col-span-12 flex items-center gap-2 px-3 py-2.5 ${showModified ? 'md:col-span-8' : 'md:col-span-9'}`}
                         >
-                            <div className="flex-1 flex items-center space-x-2 truncate" title={file.name}>
-                                <div className="w-5 flex-shrink-0 text-center">
+                            <div className="flex-1 flex items-center space-x-2 min-w-0" title={file.name}>
+                                <div className="w-5 flex-shrink-0 text-center relative group">
                                     <FontAwesomeIcon
                                         icon={isFolderItem ? ['far', 'folder'] : getFileIcon(file.mimeType, file.fileExtension)}
                                         className={`h-4 w-4 ${isFolderItem ? 'text-gray-500' : 'text-gray-400'}`}
                                     />
+                                    {/* Hover Thumbnail */}
+                                    {file.thumbnailLink && !isFolderItem && (
+                                        <div className="absolute left-6 top-1/2 -translate-y-1/2 z-50 hidden group-hover:block w-[180px] rounded-lg shadow-xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden bg-white dark:bg-gray-800 transition-all duration-200 origin-left">
+                                            <img
+                                                src={file.thumbnailLink.replace('=s220', '=s400')}
+                                                alt={file.name}
+                                                className="w-full h-auto object-cover"
+                                                loading="lazy"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                                 <span className="truncate font-medium text-gray-900 dark:text-white">
                                     {file.name}
