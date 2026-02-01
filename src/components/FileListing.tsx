@@ -92,6 +92,11 @@ const FileListing = () => {
         localStorage.setItem('preferredLayout', layout)
     }, [layout])
 
+    // Optimistic rename update
+    const handleRename = (id: string, newName: string) => {
+        setFiles(prev => prev.map(f => f.id === id ? { ...f, name: newName } : f))
+    }
+
     // Check if this is a file view
     if (isFilePath()) {
         return <FilePreview />
@@ -145,11 +150,13 @@ const FileListing = () => {
                             <FileListView
                                 files={files}
                                 onFileClick={setSelectedFile}
+                                onRenameSuccess={handleRename}
                             />
                         ) : (
                             <FileGridView
                                 files={files}
                                 onFileClick={setSelectedFile}
+                                onRenameSuccess={handleRename}
                             />
                         )}
 
