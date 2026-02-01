@@ -26,10 +26,8 @@ const DownloadButtonGroup = ({ downloadUrl, fileName, onCustomizeClick, onRename
     return (
         <Menu as="div" className="relative inline-block text-left">
             <div>
-                <Menu.Button className="inline-flex w-full justify-center rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700">
-                    <FontAwesomeIcon icon="ellipsis-vertical" className="mr-2 h-5 w-5" />
-                    Actions
-                    <FontAwesomeIcon icon="chevron-down" className="ml-2 -mr-1 h-5 w-5 text-violet-200 hover:text-violet-100" aria-hidden="true" />
+                <Menu.Button className="inline-flex w-full justify-center rounded-lg bg-gray-100 px-2 py-2 text-sm font-medium text-gray-900 hover:bg-gray-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700">
+                    <FontAwesomeIcon icon="ellipsis-vertical" className="h-5 w-5" />
                 </Menu.Button>
             </div>
             <Transition
