@@ -73,14 +73,14 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
             {sortedFiles.map((file) => (
                 <div
                     key={file.id}
-                    className="group relative overflow-hidden rounded-lg border border-gray-200/50 bg-white transition-all hover:border-gray-300 hover:shadow-md dark:border-gray-700/50 dark:bg-[#18181B] dark:hover:border-gray-600"
+                    className="group relative rounded-lg border border-gray-200/50 bg-white transition-all hover:border-gray-300 hover:shadow-md dark:border-gray-700/50 dark:bg-[#18181B] dark:hover:border-gray-600"
                 >
                     {/* Thumbnail area */}
                     <Link
                         to={getItemPath(file)}
                         className="block"
                     >
-                        <div className="relative aspect-square bg-gray-100 dark:bg-[#18181B]">
+                        <div className="relative aspect-square overflow-hidden rounded-t-lg bg-gray-100 dark:bg-[#18181B]">
                             {isImage(file) ? (
                                 <img
                                     src={getFileDownloadUrl(file)}
@@ -98,16 +98,7 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                                 </div>
                             )}
 
-                            {/* Always visible Actions Menu */}
-                            <div className="absolute top-2 right-2 z-10" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
-                                <DownloadButtonGroup
-                                    downloadUrl={getFileDownloadUrl(file)}
-                                    fileName={file.name}
-                                    onRenameClick={() => handleRenameClick(file)}
-                                    color="white"
-                                    isFolder={isFolder(file.mimeType)}
-                                />
-                            </div>
+
 
                             {/* Hover overlay with Preview only */}
                             <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
@@ -126,6 +117,17 @@ const FileGridView = ({ files, onFileClick }: FileGridViewProps) => {
                             </div>
                         </div>
                     </Link>
+
+                    {/* Always visible Actions Menu */}
+                    <div className="absolute top-2 right-2 z-10" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
+                        <DownloadButtonGroup
+                            downloadUrl={getFileDownloadUrl(file)}
+                            fileName={file.name}
+                            onRenameClick={() => handleRenameClick(file)}
+                            color="white"
+                            isFolder={isFolder(file.mimeType)}
+                        />
+                    </div>
 
                     {/* File info */}
                     <div className="p-2">
