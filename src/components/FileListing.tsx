@@ -8,6 +8,7 @@ import FileListView from './FileListView'
 import FileGridView from './FileGridView'
 import Loading from './Loading'
 import FilePreview from './previews/FilePreview'
+import { formatFileSize } from '../utils/fileIcons'
 import {
     parsePathInfo,
     fetchFolderContents,
@@ -189,8 +190,15 @@ const FileListing = () => {
             {/* File count */}
             {!loading && files.length > 0 && (
                 <div className="mt-4 text-center text-sm text-gray-500">
-                    {files.length} item{files.length !== 1 ? 's' : ''}
-                    {nextPageToken && ' (more available)'}
+                    <div>
+                        {files.length} item{files.length !== 1 ? 's' : ''}
+                        {nextPageToken && ' (more available)'}
+                    </div>
+                    {files.reduce((acc, file) => acc + (file.size ? parseInt(file.size) : 0), 0) > 0 && (
+                        <div className="mt-1">
+                            Total size: {formatFileSize(files.reduce((acc, file) => acc + (file.size ? parseInt(file.size) : 0), 0))}
+                        </div>
+                    )}
                 </div>
             )}
         </div>
