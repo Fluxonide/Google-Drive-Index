@@ -15,6 +15,132 @@ interface FileGridViewProps {
 
 import DownloadButtonGroup from './DownloadButtonGroup'
 
+const FileGridItem = ({
+    file,
+    onFileClick,
+    onRenameClick,
+    getItemPath,
+    getFileDownloadUrl
+}: {
+    file: DriveFile
+    onFileClick: (file: DriveFile) => void
+    onRenameClick: (file: DriveFile) => void
+    getItemPath: (file: DriveFile) => string
+    getFileDownloadUrl: (file: DriveFile) => string
+}) => {
+    const location = useLocation()
+    const isVideo = file.mimeType.startsWith('video/')
+    const isImageFile = file.mimeType.startsWith('image/')
+
+    const getCustomThumbnailUrl = () => {
+        if (!isVideo) return null
+        const basePath = location.pathname.endsWith('/') ? location.pathname : location.pathname + '/'
+        const fileNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name
+        // Assume the custom thumbnail is a jpg in .thumbnail folder
+        return `${basePath}.thumbnail/${encodeURIComponent(fileNameWithoutExt)}.jpg`
+    }
+
+    const customThumb = getCustomThumbnailUrl()
+    const defaultThumb = file.thumbnailLink || (isImageFile ? getFileDownloadUrl(file) : null)
+
+    // Initial source: Try custom thumb first for videos, otherwise default
+    const [imgSrc, setImgSrc] = useState<string | null>(
+        isVideo && customThumb ? customThumb : defaultThumb
+    )
+    const [hasError, setHasError] = useState(false)
+    const [usingCustom, setUsingCustom] = useState(isVideo && !!customThumb)
+
+    const handleImageError = () => {
+        if (usingCustom && defaultThumb) {
+            // Failed custom thumbnail, try default
+            setUsingCustom(false)
+            setImgSrc(defaultThumb)
+        } else {
+            // Failed default or no default available -> show icon
+            setHasError(true)
+        }
+    }
+
+    // Reset state if file changes (recycling component)
+    if (file.id && imgSrc === null && !hasError && defaultThumb) {
+        setImgSrc(defaultThumb)
+    }
+
+    return (
+        <div
+            className="group relative rounded-lg border border-gray-200/50 bg-white transition-all hover:border-gray-300 hover:shadow-md dark:border-gray-700/50 dark:bg-[#18181B] dark:hover:border-gray-600"
+        >
+            {/* Thumbnail area */}
+            <Link
+                to={getItemPath(file)}
+                className="block"
+            >
+                <div className="relative aspect-square overflow-hidden rounded-t-lg bg-gray-100 dark:bg-[#18181B]">
+                    {!hasError && imgSrc ? (
+                        <img
+                            src={imgSrc}
+                            alt={file.name}
+                            className="h-full w-full object-cover"
+                            loading="lazy"
+                            referrerPolicy="no-referrer"
+                            onError={handleImageError}
+                        />
+                    ) : null}
+
+                    {/* Fallback Icon */}
+                    <div className={`fallback-icon flex h-full w-full items-center justify-center ${!hasError && imgSrc ? 'hidden' : ''}`}>
+                        <FontAwesomeIcon
+                            icon={getFileIcon(file.mimeType, file.fileExtension)}
+                            className={`h-12 w-12 ${isFolder(file.mimeType) ? 'text-gray-500' : 'text-gray-400'}`}
+                        />
+                    </div>
+
+                    {/* Hover overlay with Preview only */}
+                    <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
+                        {!isFolder(file.mimeType) && (
+                            <button
+                                onClick={(e) => {
+                                    e.preventDefault()
+                                    onFileClick(file)
+                                }}
+                                className="rounded-full bg-white/90 p-2 text-gray-900 hover:bg-white"
+                                title="Preview"
+                            >
+                                <FontAwesomeIcon icon="eye" className="h-4 w-4" />
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </Link>
+
+            {/* Always visible Actions Menu */}
+            <div className="absolute top-2 right-2 z-10" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
+                <DownloadButtonGroup
+                    downloadUrl={getFileDownloadUrl(file)}
+                    fileName={file.name}
+                    onRenameClick={() => onRenameClick(file)}
+                    color="white"
+                    isFolder={isFolder(file.mimeType)}
+                />
+            </div>
+
+            {/* File info */}
+            <div className="p-2">
+                <Link
+                    to={getItemPath(file)}
+                    className="block truncate text-sm font-medium text-gray-900 hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
+                    title={file.name}
+                >
+                    {file.name}
+                </Link>
+                <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
+                    {formatFileSize(file.size) || 'Folder'}
+                </p>
+            </div>
+        </div>
+    )
+}
+
 const FileGridView = ({ files, onFileClick, onRenameSuccess }: FileGridViewProps) => {
     const location = useLocation()
     const { drive, path } = parsePathInfo(location.pathname)
@@ -34,10 +160,6 @@ const FileGridView = ({ files, onFileClick, onRenameSuccess }: FileGridViewProps
 
     const getFileDownloadUrl = (file: DriveFile): string => {
         return getDownloadUrl(drive, path, file.name)
-    }
-
-    const isImage = (file: DriveFile): boolean => {
-        return file.mimeType.startsWith('image/')
     }
 
     // Sort: folders first, then files alphabetically
@@ -77,84 +199,14 @@ const FileGridView = ({ files, onFileClick, onRenameSuccess }: FileGridViewProps
     return (
         <div className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {sortedFiles.map((file) => (
-                <div
+                <FileGridItem
                     key={file.id}
-                    className="group relative rounded-lg border border-gray-200/50 bg-white transition-all hover:border-gray-300 hover:shadow-md dark:border-gray-700/50 dark:bg-[#18181B] dark:hover:border-gray-600"
-                >
-                    {/* Thumbnail area */}
-                    <Link
-                        to={getItemPath(file)}
-                        className="block"
-                    >
-                        <div className="relative aspect-square overflow-hidden rounded-t-lg bg-gray-100 dark:bg-[#18181B]">
-                            {file.thumbnailLink || isImage(file) ? (
-                                <img
-                                    src={file.thumbnailLink || getFileDownloadUrl(file)}
-                                    alt={file.name}
-                                    className="h-full w-full object-cover"
-                                    loading="lazy"
-                                    referrerPolicy="no-referrer"
-                                    onError={(e) => {
-                                        // Fallback to icon if thumbnail fails to load
-                                        e.currentTarget.style.display = 'none'
-                                        e.currentTarget.parentElement?.querySelector('.fallback-icon')?.classList.remove('hidden')
-                                    }}
-                                />
-                            ) : null}
-
-                            {/* Fallback Icon (initially hidden if we have a thumbnail/image) */}
-                            <div className={`fallback-icon flex h-full w-full items-center justify-center ${file.thumbnailLink || isImage(file) ? 'hidden' : ''}`}>
-                                <FontAwesomeIcon
-                                    icon={getFileIcon(file.mimeType, file.fileExtension)}
-                                    className={`h-12 w-12 ${isFolder(file.mimeType) ? 'text-gray-500' : 'text-gray-400'}`}
-                                />
-                            </div>
-
-
-
-                            {/* Hover overlay with Preview only */}
-                            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/50 opacity-0 transition-opacity group-hover:opacity-100">
-                                {!isFolder(file.mimeType) && (
-                                    <button
-                                        onClick={(e) => {
-                                            e.preventDefault()
-                                            onFileClick(file)
-                                        }}
-                                        className="rounded-full bg-white/90 p-2 text-gray-900 hover:bg-white"
-                                        title="Preview"
-                                    >
-                                        <FontAwesomeIcon icon="eye" className="h-4 w-4" />
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    </Link>
-
-                    {/* Always visible Actions Menu */}
-                    <div className="absolute top-2 right-2 z-10" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
-                        <DownloadButtonGroup
-                            downloadUrl={getFileDownloadUrl(file)}
-                            fileName={file.name}
-                            onRenameClick={() => handleRenameClick(file)}
-                            color="white"
-                            isFolder={isFolder(file.mimeType)}
-                        />
-                    </div>
-
-                    {/* File info */}
-                    <div className="p-2">
-                        <Link
-                            to={getItemPath(file)}
-                            className="block truncate text-sm font-medium text-gray-900 hover:text-blue-600 dark:text-white dark:hover:text-blue-400"
-                            title={file.name}
-                        >
-                            {file.name}
-                        </Link>
-                        <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                            {formatFileSize(file.size) || 'Folder'}
-                        </p>
-                    </div>
-                </div>
+                    file={file}
+                    onFileClick={onFileClick}
+                    onRenameClick={handleRenameClick}
+                    getItemPath={getItemPath}
+                    getFileDownloadUrl={getFileDownloadUrl}
+                />
             ))}
             {/* Rename Modal */}
             <RenameModal
