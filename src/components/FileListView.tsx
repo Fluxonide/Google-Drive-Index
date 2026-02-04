@@ -394,7 +394,7 @@ const FileListView = ({ files, onFileClick, onRenameSuccess }: FileListViewProps
                         {/* Merged Size & Actions column */}
                         <div className="hidden md:col-span-3 md:flex items-center justify-end gap-4 pr-3">
                             <div className="w-[80px] flex-shrink-0 font-mono text-sm text-gray-700 dark:text-gray-500 text-left">
-                                {isFolderItem ? '—' : formatFileSize(file.size)}
+                                {formatFileSize(file.size) || '—'}
                             </div>
                             <div className="flex items-center justify-end space-x-1 text-gray-700 dark:text-gray-400 w-[150px]">
                                 {!isFolderItem && (

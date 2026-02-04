@@ -151,7 +151,7 @@ const FileGridView = ({ files, onFileClick, onRenameSuccess }: FileGridViewProps
                             {file.name}
                         </Link>
                         <p className="mt-0.5 text-xs text-gray-500 dark:text-gray-400">
-                            {isFolder(file.mimeType) ? 'Folder' : formatFileSize(file.size)}
+                            {formatFileSize(file.size) || 'Folder'}
                         </p>
                     </div>
                 </div>
