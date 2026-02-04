@@ -181,14 +181,13 @@ const FileListing = () => {
                 {/* File count */}
                 {!loading && files.length > 0 && (
                     <div className="mt-4 text-center text-sm text-gray-500">
-                        <div>
-                            {files.length} item{files.length !== 1 ? 's' : ''}
-                            {nextPageToken && ' (more available)'}
-                        </div>
+                        {files.length} item{files.length !== 1 ? 's' : ''}
+                        {nextPageToken && ' (more available)'}
                         {files.reduce((acc, file) => acc + (file.size ? parseInt(file.size) : 0), 0) > 0 && (
-                            <div className="mt-1">
+                            <>
+                                <span className="mx-2">•</span>
                                 Total size: {formatFileSize(files.reduce((acc, file) => acc + (file.size ? parseInt(file.size) : 0), 0))}
-                            </div>
+                            </>
                         )}
                     </div>
                 )}
