@@ -125,5 +125,44 @@ export const isPreviewable = (mimeType: string, extension?: string): boolean => 
     // Text/Code
     if (['txt', 'md', 'json', 'js', 'ts', 'py', 'html', 'css', 'xml', 'yaml'].includes(ext)) return true
 
+
     return false
+}
+
+// Extract emoji from the start of a filename
+// Returns the emoji and the cleaned filename (without the emoji and leading whitespace)
+export const extractEmojiFromFileName = (name: string): { emoji: string | null; cleanName: string } => {
+    // Check if Intl.Segmenter is supported (modern browsers/Node)
+    if (typeof Intl !== 'undefined' && 'Segmenter' in (Intl as any)) {
+        const segmenter = new (Intl as any).Segmenter([], { granularity: 'grapheme' })
+        const segments = segmenter.segment(name)
+        const iterator = segments[Symbol.iterator]()
+        const first = iterator.next()
+
+        if (!first.done) {
+            const segment = first.value.segment
+            // Check if the first segment is an emoji
+            // Using Unicode property escapes for robustness
+            // \p{Extended_Pictographic} matches most emojis
+            // \p{Emoji_Presentation} ensures it's meant to be displayed as emoji
+            if (/^[\p{Extended_Pictographic}\p{Emoji_Presentation}]/u.test(segment)) {
+                return {
+                    emoji: segment,
+                    cleanName: name.slice(segment.length).trim()
+                }
+            }
+        }
+    } else {
+        // Fallback for older environments: Simple Regex (less accurate for complex emojis)
+        const match = name.match(/^(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/)
+        if (match) {
+            const emoji = match[0]
+            return {
+                emoji: emoji,
+                cleanName: name.slice(emoji.length).trim()
+            }
+        }
+    }
+
+    return { emoji: null, cleanName: name }
 }

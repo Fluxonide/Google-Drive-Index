@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, MouseEventHandler } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { getFileIcon, formatFileSize, formatDate } from '../utils/fileIcons'
+import { getFileIcon, formatFileSize, formatDate, extractEmojiFromFileName } from '../utils/fileIcons'
 import { parsePathInfo, getDownloadUrl, isFolder, renameFile } from '../utils/api'
 import type { DriveFile } from '../types'
 import toast from 'react-hot-toast'
@@ -9,7 +9,7 @@ import RenameModal from './RenameModal'
 import DownloadButtonGroup from './DownloadButtonGroup'
 
 // Helper component for icon with hover thumbnail
-const FileHoverIcon = ({ file, isFolderItem, path, drive }: { file: DriveFile, isFolderItem: boolean, path: string, drive: number }) => {
+const FileHoverIcon = ({ file, isFolderItem, path, drive, emojiIcon }: { file: DriveFile, isFolderItem: boolean, path: string, drive: number, emojiIcon?: string | null }) => {
     const [isHovering, setIsHovering] = useState(false)
     const [imgSrc, setImgSrc] = useState<string>('')
     const [hasError, setHasError] = useState(false)
@@ -52,10 +52,16 @@ const FileHoverIcon = ({ file, isFolderItem, path, drive }: { file: DriveFile, i
             onMouseEnter={handleMouseEnter}
             onMouseLeave={() => setIsHovering(false)}
         >
-            <FontAwesomeIcon
-                icon={isFolderItem ? ['far', 'folder'] : getFileIcon(file.mimeType, file.fileExtension)}
-                className={`h-4 w-4 ${isFolderItem ? 'text-gray-500' : 'text-gray-400'}`}
-            />
+            {emojiIcon ? (
+                <span className="flex h-5 w-5 items-center justify-center text-base leading-none select-none">
+                    {emojiIcon}
+                </span>
+            ) : (
+                <FontAwesomeIcon
+                    icon={isFolderItem ? ['far', 'folder'] : getFileIcon(file.mimeType, file.fileExtension)}
+                    className={`h-4 w-4 ${isFolderItem ? 'text-gray-500' : 'text-gray-400'}`}
+                />
+            )}
             {/* Hover Thumbnail - Persisted in DOM to avoid reload flash */}
             {!isFolderItem && (imgSrc || isHovering) && (
                 <div
@@ -367,6 +373,9 @@ const FileListView = ({ files, onFileClick, onRenameSuccess }: FileListViewProps
             {/* Files */}
             {sortedFiles.map((file) => {
                 const isFolderItem = isFolder(file.mimeType)
+                const { emoji, cleanName } = isFolderItem
+                    ? extractEmojiFromFileName(file.name)
+                    : { emoji: null, cleanName: file.name }
 
                 return (
                     <div
@@ -379,9 +388,9 @@ const FileListView = ({ files, onFileClick, onRenameSuccess }: FileListViewProps
                             className={`col-span-12 flex items-center gap-2 px-3 py-2.5 ${showModified ? 'md:col-span-8' : 'md:col-span-9'}`}
                         >
                             <div className="flex-1 flex items-center space-x-2 min-w-0">
-                                <FileHoverIcon file={file} isFolderItem={isFolderItem} path={path} drive={drive} />
-                                <span className="truncate font-medium text-gray-900 dark:text-white" title={file.name}>
-                                    {file.name}
+                                <FileHoverIcon file={file} isFolderItem={isFolderItem} path={path} drive={drive} emojiIcon={emoji} />
+                                <span className="truncate font-medium text-gray-900 dark:text-white" title={cleanName}>
+                                    {cleanName}
                                 </span>
                             </div>
                             {showModified && (
