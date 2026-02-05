@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { getFileIcon, formatFileSize } from '../utils/fileIcons'
+import { getFileIcon, formatFileSize, extractEmojiFromFileName } from '../utils/fileIcons'
 import { parsePathInfo, getDownloadUrl, isFolder, renameFile } from '../utils/api'
 import type { DriveFile } from '../types'
 import toast from 'react-hot-toast'
@@ -20,13 +20,15 @@ const FileGridItem = ({
     onFileClick,
     onRenameClick,
     getItemPath,
-    getFileDownloadUrl
+    getFileDownloadUrl,
+    emojiIcon
 }: {
     file: DriveFile
     onFileClick: (file: DriveFile) => void
     onRenameClick: (file: DriveFile) => void
     getItemPath: (file: DriveFile) => string
     getFileDownloadUrl: (file: DriveFile) => string
+    emojiIcon?: string | null
 }) => {
     const location = useLocation()
     const isVideo = file.mimeType.startsWith('video/')
@@ -89,10 +91,16 @@ const FileGridItem = ({
 
                     {/* Fallback Icon */}
                     <div className={`fallback-icon flex h-full w-full items-center justify-center ${!hasError && imgSrc ? 'hidden' : ''}`}>
-                        <FontAwesomeIcon
-                            icon={getFileIcon(file.mimeType, file.fileExtension)}
-                            className={`h-12 w-12 ${isFolder(file.mimeType) ? 'text-gray-500' : 'text-gray-400'}`}
-                        />
+                        {emojiIcon ? (
+                            <span className="flex h-full w-full items-center justify-center text-6xl select-none">
+                                {emojiIcon}
+                            </span>
+                        ) : (
+                            <FontAwesomeIcon
+                                icon={getFileIcon(file.mimeType, file.fileExtension)}
+                                className={`h-12 w-12 ${isFolder(file.mimeType) ? 'text-gray-500' : 'text-gray-400'}`}
+                            />
+                        )}
                     </div>
 
                     {/* Hover overlay with Preview only */}
@@ -198,16 +206,24 @@ const FileGridView = ({ files, onFileClick, onRenameSuccess }: FileGridViewProps
 
     return (
         <div className="grid grid-cols-2 gap-4 p-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {sortedFiles.map((file) => (
-                <FileGridItem
-                    key={file.id}
-                    file={file}
-                    onFileClick={onFileClick}
-                    onRenameClick={handleRenameClick}
-                    getItemPath={getItemPath}
-                    getFileDownloadUrl={getFileDownloadUrl}
-                />
-            ))}
+            {sortedFiles.map((file) => {
+                const isFolderItem = isFolder(file.mimeType)
+                const { emoji } = isFolderItem
+                    ? extractEmojiFromFileName(file.name)
+                    : { emoji: null }
+
+                return (
+                    <FileGridItem
+                        key={file.id}
+                        file={file}
+                        onFileClick={onFileClick}
+                        onRenameClick={handleRenameClick}
+                        getItemPath={getItemPath}
+                        getFileDownloadUrl={getFileDownloadUrl}
+                        emojiIcon={emoji}
+                    />
+                )
+            })}
             {/* Rename Modal */}
             <RenameModal
                 isOpen={renameModalOpen}
