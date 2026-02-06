@@ -11,6 +11,7 @@ interface DownloadButtonGroupProps {
     color?: 'gray' | 'white'
     isFolder?: boolean
     layout?: 'menu' | 'buttons'
+    onDeleteClick?: () => void
 }
 
 const DownloadButtonGroup = ({
@@ -20,7 +21,8 @@ const DownloadButtonGroup = ({
     onRenameClick,
     color = 'gray',
     isFolder = false,
-    layout = 'menu'
+    layout = 'menu',
+    onDeleteClick
 }: DownloadButtonGroupProps) => {
     const [menuPosition, setMenuPosition] = useState<'up' | 'down'>('down')
     const buttonRef = useRef<HTMLButtonElement>(null)
@@ -172,6 +174,22 @@ const DownloadButtonGroup = ({
                                     )}
                                 </Menu.Item>
                             )}
+                        </div>
+                    )}
+                    {onDeleteClick && (
+                        <div className="px-1 py-1">
+                            <Menu.Item>
+                                {({ active }) => (
+                                    <button
+                                        onClick={onDeleteClick}
+                                        className={`${active ? 'bg-red-50 dark:bg-red-900/20' : ''
+                                            } text-red-600 dark:text-red-400 group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                                    >
+                                        <FontAwesomeIcon icon="trash" className="mr-2 h-4 w-4" />
+                                        Delete
+                                    </button>
+                                )}
+                            </Menu.Item>
                         </div>
                     )}
                 </Menu.Items>
