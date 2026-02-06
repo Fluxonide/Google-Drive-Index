@@ -252,6 +252,43 @@ export async function renameFile(
 }
 
 /**
+ * Delete a file
+ */
+export async function deleteFile(
+    drive: number,
+    fileId: string
+): Promise<any> {
+    // MOCK DATA FOR LOCAL DEV
+    if (import.meta.env.DEV) {
+        console.log('Deleting file in DEV mode', fileId)
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const index = MOCK_FILES.findIndex(f => f.id === fileId)
+                if (index !== -1) MOCK_FILES.splice(index, 1)
+                resolve({ success: true })
+            }, 500)
+        })
+    }
+
+    const response = await fetch(`${API_BASE}/${drive}:delete`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            id: fileId,
+        }),
+    })
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Unknown error' }))
+        throw new Error(error.message || `Delete failed: ${response.status}`)
+    }
+
+    return response.json()
+}
+
+/**
  * Get download URL for a file (raw/direct download)
  */
 export function getDownloadUrl(drive: number, path: string, filename: string): string {
