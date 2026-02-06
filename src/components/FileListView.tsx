@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, MouseEventHandler } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { getFileIcon, formatFileSize, formatDate, extractEmojiFromFileName } from '../utils/fileIcons'
-import { parsePathInfo, getDownloadUrl, isFolder, renameFile } from '../utils/api'
+import { parsePathInfo, getDownloadUrl, isFolder, renameFile, deleteFile } from '../utils/api'
 import type { DriveFile } from '../types'
 import toast from 'react-hot-toast'
 import RenameModal from './RenameModal'
@@ -139,9 +139,10 @@ interface FileListViewProps {
     files: DriveFile[]
     onFileClick: (file: DriveFile) => void
     onRenameSuccess?: (id: string, newName: string) => void
+    onDeleteSuccess?: (id: string) => void
 }
 
-const FileListView = ({ files, onFileClick, onRenameSuccess }: FileListViewProps) => {
+const FileListView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: FileListViewProps) => {
     const location = useLocation()
     const { drive, path } = parsePathInfo(location.pathname)
 
@@ -323,6 +324,23 @@ const FileListView = ({ files, onFileClick, onRenameSuccess }: FileListViewProps
         return () => clearTimeout(timer)
     }, [files, path, drive])
 
+    const handleDeleteClick = async (file: DriveFile) => {
+        if (!confirm(`Are you sure you want to delete "${file.name}"?`)) return
+
+        try {
+            await deleteFile(drive, file.id)
+            toast.success('File deleted successfully')
+            if (onDeleteSuccess) {
+                onDeleteSuccess(file.id)
+            } else {
+                setTimeout(() => window.location.reload(), 500)
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error('Failed to delete file')
+        }
+    }
+
     return (
         <div className="rounded bg-white shadow-sm dark:bg-[#18181B] dark:text-gray-100">
             {/* Header */}
@@ -420,6 +438,7 @@ const FileListView = ({ files, onFileClick, onRenameSuccess }: FileListViewProps
                                         downloadUrl={getFileDownloadUrl(file)}
                                         fileName={file.name}
                                         onRenameClick={() => handleRenameClick(file)}
+                                        onDeleteClick={() => handleDeleteClick(file)}
                                         isFolder={isFolderItem}
                                     />
                                 </div>

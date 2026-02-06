@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { getFileIcon, formatFileSize, extractEmojiFromFileName } from '../utils/fileIcons'
-import { parsePathInfo, getDownloadUrl, isFolder, renameFile } from '../utils/api'
+import { parsePathInfo, getDownloadUrl, isFolder, renameFile, deleteFile } from '../utils/api'
 import type { DriveFile } from '../types'
 import toast from 'react-hot-toast'
 import { useState } from 'react'
@@ -10,7 +10,10 @@ import RenameModal from './RenameModal'
 interface FileGridViewProps {
     files: DriveFile[]
     onFileClick: (file: DriveFile) => void
+    files: DriveFile[]
+    onFileClick: (file: DriveFile) => void
     onRenameSuccess?: (id: string, newName: string) => void
+    onDeleteSuccess?: (id: string) => void
 }
 
 import DownloadButtonGroup from './DownloadButtonGroup'
@@ -19,13 +22,16 @@ const FileGridItem = ({
     file,
     onFileClick,
     onRenameClick,
+    onDeleteClick,
     getItemPath,
     getFileDownloadUrl,
     emojiIcon
 }: {
     file: DriveFile
     onFileClick: (file: DriveFile) => void
+    onFileClick: (file: DriveFile) => void
     onRenameClick: (file: DriveFile) => void
+    onDeleteClick: (file: DriveFile) => void
     getItemPath: (file: DriveFile) => string
     getFileDownloadUrl: (file: DriveFile) => string
     emojiIcon?: string | null
@@ -127,6 +133,7 @@ const FileGridItem = ({
                     downloadUrl={getFileDownloadUrl(file)}
                     fileName={file.name}
                     onRenameClick={() => onRenameClick(file)}
+                    onDeleteClick={() => onDeleteClick(file)}
                     color="white"
                     isFolder={isFolder(file.mimeType)}
                 />
@@ -149,9 +156,26 @@ const FileGridItem = ({
     )
 }
 
-const FileGridView = ({ files, onFileClick, onRenameSuccess }: FileGridViewProps) => {
+const FileGridView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: FileGridViewProps) => {
     const location = useLocation()
     const { drive, path } = parsePathInfo(location.pathname)
+
+    const handleDeleteClick = async (file: DriveFile) => {
+        if (!confirm(`Are you sure you want to delete "${file.name}"?`)) return
+
+        try {
+            await deleteFile(drive, file.id)
+            toast.success('File deleted successfully')
+            if (onDeleteSuccess) {
+                onDeleteSuccess(file.id)
+            } else {
+                setTimeout(() => window.location.reload(), 500)
+            }
+        } catch (error) {
+            console.error(error)
+            toast.error('Failed to delete file')
+        }
+    }
 
     // Rename state
     const [renameModalOpen, setRenameModalOpen] = useState(false)
