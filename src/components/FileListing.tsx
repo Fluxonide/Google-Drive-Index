@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { Transition } from '@headlessui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import toast from 'react-hot-toast'
 import Breadcrumb from './Breadcrumb'
@@ -138,19 +139,31 @@ const FileListing = () => {
 
                     {!loading && !error && files.length > 0 && (
                         <>
-                            {layout === 'list' ? (
-                                <FileListView
-                                    files={files}
-                                    onFileClick={setSelectedFile}
-                                    onRenameSuccess={handleRename}
-                                />
-                            ) : (
-                                <FileGridView
-                                    files={files}
-                                    onFileClick={setSelectedFile}
-                                    onRenameSuccess={handleRename}
-                                />
-                            )}
+                            <Transition
+                                appear={true}
+                                show={true}
+                                key={layout + location.pathname}
+                                enter="transition duration-200 ease-out"
+                                enterFrom="opacity-0 translate-y-2"
+                                enterTo="opacity-100 translate-y-0"
+                                leave="transition duration-150 ease-in"
+                                leaveFrom="opacity-100 translate-y-0"
+                                leaveTo="opacity-0 translate-y-2"
+                            >
+                                {layout === 'list' ? (
+                                    <FileListView
+                                        files={files}
+                                        onFileClick={setSelectedFile}
+                                        onRenameSuccess={handleRename}
+                                    />
+                                ) : (
+                                    <FileGridView
+                                        files={files}
+                                        onFileClick={setSelectedFile}
+                                        onRenameSuccess={handleRename}
+                                    />
+                                )}
+                            </Transition>
 
                             {/* Load more button */}
                             {nextPageToken && (
