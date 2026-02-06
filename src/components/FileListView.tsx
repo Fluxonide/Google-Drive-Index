@@ -153,6 +153,10 @@ const FileListView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
     const [renameModalOpen, setRenameModalOpen] = useState(false)
     const [fileToRename, setFileToRename] = useState<DriveFile | null>(null)
 
+    // Delete state
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+    const [fileToDelete, setFileToDelete] = useState<DriveFile | null>(null)
+
     // Column visibility state (persisted to localStorage)
     const [showModified, setShowModified] = useState<boolean>(() => {
         const stored = localStorage.getItem('showModifiedColumn')
@@ -324,14 +328,19 @@ const FileListView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
         return () => clearTimeout(timer)
     }, [files, path, drive])
 
-    const handleDeleteClick = async (file: DriveFile) => {
-        if (!confirm(`Are you sure you want to delete "${file.name}"?`)) return
+    const handleDeleteClick = (file: DriveFile) => {
+        setFileToDelete(file)
+        setDeleteModalOpen(true)
+    }
+
+    const handleDeleteSubmit = async () => {
+        if (!fileToDelete) return
 
         try {
-            await deleteFile(drive, file.id)
+            await deleteFile(drive, fileToDelete.id)
             toast.success('File deleted successfully')
             if (onDeleteSuccess) {
-                onDeleteSuccess(file.id)
+                onDeleteSuccess(fileToDelete.id)
             } else {
                 setTimeout(() => window.location.reload(), 500)
             }

@@ -160,14 +160,19 @@ const FileGridView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
     const location = useLocation()
     const { drive, path } = parsePathInfo(location.pathname)
 
-    const handleDeleteClick = async (file: DriveFile) => {
-        if (!confirm(`Are you sure you want to delete "${file.name}"?`)) return
+    const handleDeleteClick = (file: DriveFile) => {
+        setFileToDelete(file)
+        setDeleteModalOpen(true)
+    }
+
+    const handleDeleteSubmit = async () => {
+        if (!fileToDelete) return
 
         try {
-            await deleteFile(drive, file.id)
+            await deleteFile(drive, fileToDelete.id)
             toast.success('File deleted successfully')
             if (onDeleteSuccess) {
-                onDeleteSuccess(file.id)
+                onDeleteSuccess(fileToDelete.id)
             } else {
                 setTimeout(() => window.location.reload(), 500)
             }
@@ -180,6 +185,10 @@ const FileGridView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
     // Rename state
     const [renameModalOpen, setRenameModalOpen] = useState(false)
     const [fileToRename, setFileToRename] = useState<DriveFile | null>(null)
+
+    // Delete state
+    const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+    const [fileToDelete, setFileToDelete] = useState<DriveFile | null>(null)
 
     const getItemPath = (file: DriveFile): string => {
         const basePath = location.pathname.endsWith('/')
