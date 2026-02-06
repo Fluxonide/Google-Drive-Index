@@ -94,10 +94,17 @@ const FileListing = () => {
         localStorage.setItem('preferredLayout', layout)
     }, [layout])
 
+
     // Optimistic rename update
     const handleRename = (id: string, newName: string) => {
         setFiles(prev => prev.map(f => f.id === id ? { ...f, name: newName } : f))
     }
+
+    // Optimistic delete update
+    const handleDelete = (id: string) => {
+        setFiles(prev => prev.filter(f => f.id !== id))
+    }
+
 
     // Check if this is a file view
     if (isFilePath()) {
@@ -155,12 +162,14 @@ const FileListing = () => {
                                         files={files}
                                         onFileClick={setSelectedFile}
                                         onRenameSuccess={handleRename}
+                                        onDeleteSuccess={handleDelete}
                                     />
                                 ) : (
                                     <FileGridView
                                         files={files}
                                         onFileClick={setSelectedFile}
                                         onRenameSuccess={handleRename}
+                                        onDeleteSuccess={handleDelete}
                                     />
                                 )}
                             </Transition>
