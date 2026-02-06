@@ -6,6 +6,7 @@ import { parsePathInfo, getDownloadUrl, isFolder, renameFile, deleteFile } from 
 import type { DriveFile } from '../types'
 import toast from 'react-hot-toast'
 import RenameModal from './RenameModal'
+import DeleteModal from './DeleteModal'
 import DownloadButtonGroup from './DownloadButtonGroup'
 
 // Helper component for icon with hover thumbnail
@@ -473,6 +474,14 @@ const FileListView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
                 onClose={() => setRenameModalOpen(false)}
                 onRename={onRenameSubmit}
                 currentName={fileToRename?.name || ''}
+            />
+
+            {/* Delete Modal */}
+            <DeleteModal
+                isOpen={deleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                onDelete={handleDeleteSubmit}
+                fileName={fileToDelete?.name || ''}
             />
         </div>
     )
