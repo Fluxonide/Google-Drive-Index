@@ -6,10 +6,9 @@ import type { DriveFile } from '../types'
 import toast from 'react-hot-toast'
 import { useState } from 'react'
 import RenameModal from './RenameModal'
+import DeleteModal from './DeleteModal'
 
 interface FileGridViewProps {
-    files: DriveFile[]
-    onFileClick: (file: DriveFile) => void
     files: DriveFile[]
     onFileClick: (file: DriveFile) => void
     onRenameSuccess?: (id: string, newName: string) => void
@@ -28,7 +27,6 @@ const FileGridItem = ({
     emojiIcon
 }: {
     file: DriveFile
-    onFileClick: (file: DriveFile) => void
     onFileClick: (file: DriveFile) => void
     onRenameClick: (file: DriveFile) => void
     onDeleteClick: (file: DriveFile) => void
@@ -254,6 +252,7 @@ const FileGridView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
                         getItemPath={getItemPath}
                         getFileDownloadUrl={getFileDownloadUrl}
                         emojiIcon={emoji}
+                        onDeleteClick={handleDeleteClick}
                     />
                 )
             })}
@@ -263,6 +262,14 @@ const FileGridView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
                 onClose={() => setRenameModalOpen(false)}
                 onRename={onRenameSubmit}
                 currentName={fileToRename?.name || ''}
+            />
+
+            {/* Delete Modal */}
+            <DeleteModal
+                isOpen={deleteModalOpen}
+                onClose={() => setDeleteModalOpen(false)}
+                onDelete={handleDeleteSubmit}
+                fileName={fileToDelete?.name || ''}
             />
         </div>
     )
