@@ -2,8 +2,8 @@ import { useState, Fragment, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Dialog, Transition } from '@headlessui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { getFileIcon } from '../utils/fileIcons'
-import { searchFiles, DEFAULT_DRIVE } from '../utils/api'
+import { getFileIcon, extractEmojiFromFileName } from '../utils/fileIcons'
+import { searchFiles, isFolder, DEFAULT_DRIVE } from '../utils/api'
 import type { DriveFile } from '../types'
 
 interface SearchModalProps {
@@ -123,28 +123,43 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
 
                                     {!loading && results.length > 0 && (
                                         <ul className="divide-y divide-gray-100 dark:divide-gray-800">
-                                            {results.map((file) => (
-                                                <li key={file.id}>
-                                                    <Link
-                                                        to={file.link || '#'}
-                                                        onClick={() => {
-                                                            onClose()
-                                                            setQuery('')
-                                                        }}
-                                                        className="flex w-full items-center space-x-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
-                                                    >
-                                                        <FontAwesomeIcon
-                                                            icon={getFileIcon(file.mimeType, file.fileExtension)}
-                                                            className="h-5 w-5 text-gray-400"
-                                                        />
-                                                        <div className="flex-1 truncate">
-                                                            <div className="truncate font-medium text-gray-900 dark:text-white">
-                                                                {file.name}
+                                            {results.map((file) => {
+                                                const isFolderItem = isFolder(file.mimeType)
+                                                const { emoji, cleanName } = isFolderItem
+                                                    ? extractEmojiFromFileName(file.name)
+                                                    : { emoji: null, cleanName: file.name }
+
+                                                return (
+                                                    <li key={file.id}>
+                                                        <Link
+                                                            to={file.link || '#'}
+                                                            onClick={() => {
+                                                                onClose()
+                                                                setQuery('')
+                                                            }}
+                                                            className="flex w-full items-center space-x-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+                                                        >
+                                                            <div className="flex-shrink-0 w-5 text-center">
+                                                                {emoji ? (
+                                                                    <span className="flex h-5 w-5 items-center justify-center text-base leading-none select-none">
+                                                                        {emoji}
+                                                                    </span>
+                                                                ) : (
+                                                                    <FontAwesomeIcon
+                                                                        icon={isFolderItem ? ['far', 'folder'] : getFileIcon(file.mimeType, file.fileExtension)}
+                                                                        className={`h-4 w-4 ${isFolderItem ? 'text-gray-500' : 'text-gray-400'}`}
+                                                                    />
+                                                                )}
                                                             </div>
-                                                        </div>
-                                                    </Link>
-                                                </li>
-                                            ))}
+                                                            <div className="flex-1 truncate">
+                                                                <div className="truncate font-medium text-gray-900 dark:text-white">
+                                                                    {cleanName}
+                                                                </div>
+                                                            </div>
+                                                        </Link>
+                                                    </li>
+                                                )
+                                            })}
                                         </ul>
                                     )}
 
