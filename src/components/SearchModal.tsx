@@ -16,7 +16,22 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
     const [results, setResults] = useState<DriveFile[]>([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
+    const [selectedIndex, setSelectedIndex] = useState(-1)
     const navigate = useNavigate()
+
+    // Reset selected index when results change
+    useEffect(() => {
+        setSelectedIndex(results.length > 0 ? 0 : -1)
+    }, [results])
+
+    // Reset state when modal closes
+    useEffect(() => {
+        if (!isOpen) {
+            setQuery('')
+            setResults([])
+            setSelectedIndex(-1)
+        }
+    }, [isOpen])
 
     // Debounced search
     useEffect(() => {
@@ -49,6 +64,32 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
         // Navigate to file location
         // For now we just close the modal - proper path building would require parent path from API
         navigate(`/${DEFAULT_DRIVE}:/${encodeURIComponent(file.name)}${file.mimeType.includes('folder') ? '/' : ''}`)
+    }
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if (results.length === 0) return
+
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault()
+                setSelectedIndex(prev => (prev + 1) % results.length)
+                break
+            case 'ArrowUp':
+                e.preventDefault()
+                setSelectedIndex(prev => (prev - 1 + results.length) % results.length)
+                break
+            case 'Enter':
+                e.preventDefault()
+                if (selectedIndex >= 0 && selectedIndex < results.length) {
+                    const file = results[selectedIndex]
+                    onClose()
+                    setQuery('')
+                    if (file.link) {
+                        navigate(file.link)
+                    }
+                }
+                break
+        }
     }
 
     return (
@@ -90,6 +131,7 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                                         placeholder="Search files and folders..."
                                         value={query}
                                         onChange={(e) => setQuery(e.target.value)}
+                                        onKeyDown={handleKeyDown}
                                         autoFocus
                                     />
                                     <kbd className="rounded bg-gray-100 px-2 py-1 text-xs font-medium text-gray-500 dark:bg-gray-800 dark:text-gray-400">
@@ -123,11 +165,12 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
 
                                     {!loading && results.length > 0 && (
                                         <ul className="divide-y divide-gray-100 dark:divide-gray-800">
-                                            {results.map((file) => {
+                                            {results.map((file, index) => {
                                                 const isFolderItem = isFolder(file.mimeType)
                                                 const { emoji, cleanName } = isFolderItem
                                                     ? extractEmojiFromFileName(file.name)
                                                     : { emoji: null, cleanName: file.name }
+                                                const isSelected = index === selectedIndex
 
                                                 return (
                                                     <li key={file.id}>
@@ -137,7 +180,7 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                                                                 onClose()
                                                                 setQuery('')
                                                             }}
-                                                            className="flex w-full items-center space-x-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 dark:hover:bg-gray-800"
+                                                            className={`flex w-full items-center space-x-3 px-4 py-3 text-left transition-colors ${isSelected ? 'bg-blue-50 dark:bg-blue-900/30' : 'hover:bg-gray-50 dark:hover:bg-gray-800'}`}
                                                         >
                                                             <div className="flex-shrink-0 w-5 text-center">
                                                                 {emoji ? (
@@ -168,6 +211,22 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                                             Start typing to search...
                                         </div>
                                     )}
+                                </div>
+
+                                {/* Keyboard hints footer */}
+                                <div className="flex items-center justify-center gap-4 border-t border-gray-200 px-4 py-2 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400">
+                                    <span className="flex items-center gap-1">
+                                        <kbd className="rounded bg-gray-100 px-1.5 py-0.5 font-medium dark:bg-gray-800">↑↓</kbd>
+                                        <span>to navigate</span>
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <kbd className="rounded bg-gray-100 px-1.5 py-0.5 font-medium dark:bg-gray-800">Enter</kbd>
+                                        <span>to select</span>
+                                    </span>
+                                    <span className="flex items-center gap-1">
+                                        <kbd className="rounded bg-gray-100 px-1.5 py-0.5 font-medium dark:bg-gray-800">ESC</kbd>
+                                        <span>to close</span>
+                                    </span>
                                 </div>
                             </Dialog.Panel>
                         </Transition.Child>
