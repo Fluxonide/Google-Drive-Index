@@ -77,6 +77,13 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                 const { fetchFolderContents } = await import('../../utils/api')
                 const folderData = await fetchFolderContents(drive, parentPath)
 
+                // Debug: Log what the API returned
+                console.log('FilePreview: Parent folder API response', {
+                    filesCount: folderData.data?.files?.length || 0,
+                    files: folderData.data?.files?.map(f => ({ name: f.name, size: f.size, modifiedTime: f.modifiedTime })),
+                    searchingFor: fileName
+                })
+
                 // Try multiple matching strategies for the filename
                 const decodedFileName = decodeURIComponent(fileName)
                 const foundFile = folderData.data.files.find(f => {
