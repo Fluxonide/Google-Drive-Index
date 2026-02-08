@@ -77,10 +77,24 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                 const { fetchFolderContents } = await import('../../utils/api')
                 const folderData = await fetchFolderContents(drive, parentPath)
 
-                const foundFile = folderData.data.files.find(f => f.name === fileName)
+                // Try multiple matching strategies for the filename
+                const decodedFileName = decodeURIComponent(fileName)
+                const foundFile = folderData.data.files.find(f => {
+                    // Exact match
+                    if (f.name === fileName) return true
+                    // Decoded match
+                    if (f.name === decodedFileName) return true
+                    // Case-insensitive match
+                    if (f.name.toLowerCase() === fileName.toLowerCase()) return true
+                    if (f.name.toLowerCase() === decodedFileName.toLowerCase()) return true
+                    return false
+                })
 
                 if (foundFile) {
+                    console.log('FilePreview: Found file with full metadata', foundFile)
                     setFileData(foundFile)
+                } else {
+                    console.log('FilePreview: Could not find file in parent folder, using temp data')
                 }
             } catch (err) {
                 console.error('Failed to load file details:', err)
