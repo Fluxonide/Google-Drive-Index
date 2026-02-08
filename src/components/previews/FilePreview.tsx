@@ -323,36 +323,30 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
     // Video uses custom FileMetadata
     const VideoFileMetadata = () => (
         <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
-            {fileData?.size !== undefined && (
-                <div>
-                    <div className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
-                        File Size
-                    </div>
-                    <div className="mt-1 text-gray-900 dark:text-white">
-                        {formatFileSize(fileData.size)}
-                    </div>
+            <div>
+                <div className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
+                    File Size
                 </div>
-            )}
-            {fileData?.mimeType && (
-                <div>
-                    <div className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
-                        MIME Type
-                    </div>
-                    <div className="mt-1 font-mono text-gray-900 dark:text-white">
-                        {fileData.mimeType}
-                    </div>
+                <div className="mt-1 text-gray-900 dark:text-white">
+                    {fileData?.size ? formatFileSize(fileData.size) : 'Unknown'}
                 </div>
-            )}
-            {fileData?.modifiedTime && (
-                <div>
-                    <div className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
-                        Last Modified
-                    </div>
-                    <div className="mt-1 text-gray-900 dark:text-white">
-                        {formatDate(fileData.modifiedTime)}
-                    </div>
+            </div>
+            <div>
+                <div className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
+                    MIME Type
                 </div>
-            )}
+                <div className="mt-1 font-mono text-gray-900 dark:text-white">
+                    {fileData?.mimeType || 'Unknown'}
+                </div>
+            </div>
+            <div>
+                <div className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
+                    Last Modified
+                </div>
+                <div className="mt-1 text-gray-900 dark:text-white">
+                    {fileData?.modifiedTime ? formatDate(fileData.modifiedTime) : 'Unknown'}
+                </div>
+            </div>
             {fileData?.createdTime && (
                 <div>
                     <div className="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">
