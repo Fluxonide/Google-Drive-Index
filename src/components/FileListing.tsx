@@ -9,6 +9,7 @@ import FileListView from './FileListView'
 import FileGridView from './FileGridView'
 import Loading from './Loading'
 import FilePreview from './previews/FilePreview'
+import MarkdownPreview from './previews/MarkdownPreview'
 import { formatFileSize } from '../utils/fileIcons'
 import {
     parsePathInfo,
@@ -213,6 +214,16 @@ const FileListing = () => {
                         )}
                     </div>
                 )}
+
+                {/* README.md preview */}
+                {!loading && files.length > 0 && (() => {
+                    const readmeFile = files.find(f => f.name.toLowerCase() === 'readme.md')
+                    if (readmeFile) {
+                        const currentPath = location.pathname.endsWith('/') ? location.pathname : location.pathname + '/'
+                        return <MarkdownPreview file={readmeFile} basePath={currentPath} standalone={false} />
+                    }
+                    return null
+                })()}
             </div>
 
             {/* Preview Modal Overlay */}
