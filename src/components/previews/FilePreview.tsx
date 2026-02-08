@@ -67,9 +67,17 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                 setFileData(tempData)
 
                 // Need to fetch properties from parent folder to get the ID
-                // Construct parent path
+                // Construct parent path - decode the path to handle URL-encoded spaces/special chars
                 const { drive, path } = parsePathInfo(location.pathname)
-                const parentPath = path.substring(0, path.lastIndexOf(fileName))
+                const decodedPath = decodeURIComponent(path)
+                const parentPath = decodedPath.substring(0, decodedPath.lastIndexOf(fileName))
+
+                console.log('FilePreview: Path construction', {
+                    rawPath: path,
+                    decodedPath,
+                    fileName,
+                    parentPath
+                })
 
                 // Fetch parent folder contents to find this file
                 // Import fetchFolderContents dynamically to avoid circular deps if any, 
