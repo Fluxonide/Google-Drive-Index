@@ -493,29 +493,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                 <div className="mb-4">
                     <Breadcrumb />
                 </div>
-                {/* File Metadata Bar for full page view */}
-                {fileData && (isVideo || isAudio) && (
-                    <div className="mb-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-500 dark:text-gray-400">
-                        {fileData.size !== undefined && (
-                            <div className="flex items-center gap-1.5">
-                                <FontAwesomeIcon icon="hard-drive" className="h-3.5 w-3.5" />
-                                <span>{formatFileSize(fileData.size)}</span>
-                            </div>
-                        )}
-                        {fileData.mimeType && (
-                            <div className="flex items-center gap-1.5">
-                                <FontAwesomeIcon icon="file" className="h-3.5 w-3.5" />
-                                <span className="font-mono text-xs">{fileData.mimeType}</span>
-                            </div>
-                        )}
-                        {fileData.modifiedTime && (
-                            <div className="flex items-center gap-1.5">
-                                <FontAwesomeIcon icon="clock" className="h-3.5 w-3.5" />
-                                <span>{formatDate(fileData.modifiedTime)}</span>
-                            </div>
-                        )}
-                    </div>
-                )}
+
                 {content}
             </div>
         </>
