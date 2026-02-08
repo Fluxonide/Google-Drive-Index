@@ -1,7 +1,7 @@
 {
   "name": "google-drive-index",
   "private": true,
-  "version": "1.6.1-beta.1",
+  "version": "1.6.2-beta.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -22,7 +22,9 @@
     "react-audio-player": "^0.17.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^6.22.0",
+    "remark-gfm": "^4.0.1",
     "swr": "^2.2.5"
   },
   "devDependencies": {
