@@ -201,6 +201,16 @@ const FileListing = () => {
                     )}
                 </div>
 
+                {/* README.md preview */}
+                {!loading && files.length > 0 && (() => {
+                    const readmeFile = files.find(f => f.name.toLowerCase() === 'readme.md')
+                    if (readmeFile) {
+                        const currentPath = location.pathname.endsWith('/') ? location.pathname : location.pathname + '/'
+                        return <MarkdownPreview file={readmeFile} basePath={currentPath} standalone={false} />
+                    }
+                    return null
+                })()}
+
                 {/* File count */}
                 {!loading && files.length > 0 && (
                     <div className="mt-4 text-center text-sm text-gray-500">
@@ -214,16 +224,6 @@ const FileListing = () => {
                         )}
                     </div>
                 )}
-
-                {/* README.md preview */}
-                {!loading && files.length > 0 && (() => {
-                    const readmeFile = files.find(f => f.name.toLowerCase() === 'readme.md')
-                    if (readmeFile) {
-                        const currentPath = location.pathname.endsWith('/') ? location.pathname : location.pathname + '/'
-                        return <MarkdownPreview file={readmeFile} basePath={currentPath} standalone={false} />
-                    }
-                    return null
-                })()}
             </div>
 
             {/* Preview Modal Overlay */}
