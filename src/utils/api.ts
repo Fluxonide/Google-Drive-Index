@@ -111,10 +111,10 @@ export const MOCK_FILES: DriveFile[] = [
         id: 'readme1',
         name: 'README.md',
         mimeType: 'text/markdown',
-        size: '1500',
+        size: '500',
         modifiedTime: new Date().toISOString(),
-        // Use raw.githubusercontent.com for a sample README
-        link: 'https://raw.githubusercontent.com/microsoft/vscode/main/README.md'
+        // For local dev, this will fetch from the project root README
+        link: '/README.md'
     }
 ]
 
