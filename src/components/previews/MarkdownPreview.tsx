@@ -48,7 +48,11 @@ const MarkdownPreview: FC<MarkdownPreviewProps> = ({ file, basePath, standalone 
     }
 
     if (error) {
-        return null // Silently hide on error — no retry, no error UI
+        return (
+            <div className={`rounded-lg border border-yellow-200/50 bg-yellow-50/50 p-3 text-center dark:border-yellow-800/30 dark:bg-yellow-900/10 ${standalone ? '' : 'mt-4'}`}>
+                <span className="text-xs text-yellow-600 dark:text-yellow-500">README.md could not be loaded</span>
+            </div>
+        )
     }
 
     return (
