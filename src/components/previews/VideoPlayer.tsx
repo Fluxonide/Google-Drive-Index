@@ -3,8 +3,6 @@ import { useEffect, useRef, useState, FC } from 'react'
 interface VideoPlayerProps {
     videoUrl: string
     videoName: string
-    poster?: string
-    customPoster?: string
 }
 
 declare global {
@@ -18,21 +16,17 @@ declare global {
     }
 }
 
-const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, customPoster }) => {
+const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName }) => {
     const containerRef = useRef<HTMLDivElement>(null)
     const playerRef = useRef<any>(null)
 
-    // Initial poster is the default one provided
-    const [effectivePoster, setEffectivePoster] = useState<string>(poster || '')
-    const [isValidatingPoster, setIsValidatingPoster] = useState<boolean>(!!customPoster)
     const [resourcesLoaded, setResourcesLoaded] = useState<boolean>(false)
+    const [videoError, setVideoError] = useState<string | null>(null)
 
     // Helper to load script and css
     const loadPlayerResources = async () => {
-        // console.log('VideoPlayer: Loading resources...')
         const playerJs = window.UI?.player_js
         const playerCss = window.UI?.player_css
-        // console.log('VideoPlayer: Config URLs:', { playerJs, playerCss })
 
         if (!playerJs || !playerCss) {
             console.error('DPlayer configuration missing in window.UI')
@@ -41,7 +35,6 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
 
         // Load CSS
         if (!document.querySelector(`link[href="${playerCss}"]`)) {
-            // console.log('VideoPlayer: Injecting CSS')
             const link = document.createElement('link')
             link.rel = 'stylesheet'
             link.href = playerCss
@@ -50,22 +43,16 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
 
         // Load JS
         if (!window.DPlayer) {
-            // console.log('VideoPlayer: Injecting JS')
             return new Promise<void>((resolve, reject) => {
                 const script = document.createElement('script')
                 script.src = playerJs
-                script.onload = () => {
-                    // console.log('VideoPlayer: JS loaded successfully')
-                    resolve()
-                }
+                script.onload = () => resolve()
                 script.onerror = () => {
                     console.error('VideoPlayer: Failed to load JS')
                     reject(new Error('Failed to load DPlayer'))
                 }
                 document.body.appendChild(script)
             })
-        } else {
-            // console.log('VideoPlayer: window.DPlayer already exists')
         }
     }
 
@@ -74,43 +61,12 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
         loadPlayerResources().then(() => setResourcesLoaded(true)).catch(console.error)
     }, [])
 
-    // Check custom poster
-    useEffect(() => {
-        if (customPoster) {
-            setIsValidatingPoster(true)
-            fetch(customPoster, { method: 'HEAD' })
-                .then((res) => {
-                    if (res.ok && (res.status === 200 || res.status === 304)) {
-                        setEffectivePoster(customPoster)
-                    } else {
-                        // Custom poster not found, keep default
-                        // No need to reset if it's already poster (default)
-                        // But if prop changed, effectivePoster would be stale?
-                        // Actually validation usually happens on mount or prop change.
-                        // If we are VALIDATING, effectivePoster is currently 'poster'.
-                        // So if we fail, we just keep it as 'poster'.
-                    }
-                })
-                .catch((e) => {
-                    // Custom poster check error, keep default
-                })
-                .finally(() => {
-                    setIsValidatingPoster(false)
-                })
-        } else {
-            setEffectivePoster(poster || '')
-            setIsValidatingPoster(false)
-        }
-    }, [customPoster, poster])
-
     // Initialize Player
     useEffect(() => {
         let mounted = true
 
         const initPlayer = async () => {
             if (!containerRef.current) return
-
-            // Wait for resources ONLY. Do NOT wait for validation.
             if (!resourcesLoaded) return
 
             try {
@@ -121,16 +77,18 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
                     playerRef.current.destroy()
                 }
 
+                // Reset error state on new init
+                setVideoError(null)
+
                 // Create VideoPlayer instance
-                playerRef.current = new window.DPlayer({
+                const dp = new window.DPlayer({
                     container: containerRef.current,
                     video: {
                         url: videoUrl,
-                        pic: effectivePoster,
                         type: 'auto',
                     },
                     autoplay: false,
-                    theme: '#8b5cf6', // Violet-500 for better visibility
+                    theme: '#8b5cf6',
                     loop: false,
                     lang: 'en',
                     screenshot: true,
@@ -144,6 +102,15 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
                             link: videoUrl,
                         },
                     ],
+                })
+
+                playerRef.current = dp
+
+                // Listen for video errors to show a user-friendly message
+                dp.on('error', () => {
+                    if (mounted) {
+                        setVideoError('Video failed to load. The server returned an error — try refreshing or downloading the file instead.')
+                    }
                 })
             } catch (err) {
                 console.error('Failed to initialize player:', err)
@@ -160,7 +127,7 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
                 playerRef.current = null
             }
         }
-    }, [videoUrl, videoName, effectivePoster, resourcesLoaded]) // Removed isValidatingPoster dependency
+    }, [videoUrl, videoName, resourcesLoaded])
 
     return (
         <div className="mx-auto aspect-video w-full max-h-[80vh] overflow-hidden rounded-lg bg-black relative group shadow-lg ring-1 ring-white/10">
@@ -170,6 +137,20 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
                         <div className="absolute inset-0 rounded-full border-4 border-white/20"></div>
                         <div className="absolute inset-0 rounded-full border-4 border-t-white border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
                     </div>
+                </div>
+            )}
+            {videoError && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 z-20 px-6 text-center">
+                    <svg className="h-10 w-10 text-red-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                    </svg>
+                    <p className="text-white/80 text-sm max-w-sm">{videoError}</p>
+                    <button
+                        onClick={() => window.location.reload()}
+                        className="mt-3 px-4 py-1.5 rounded-lg bg-white/10 text-white/70 text-xs hover:bg-white/20 transition-colors"
+                    >
+                        Retry
+                    </button>
                 </div>
             )}
             <div ref={containerRef} className="h-full w-full" />
