@@ -64,7 +64,7 @@ const Navbar = () => {
                     {/* Logo + Drive Switcher */}
                     <div className="flex items-center space-x-2">
                         <Link
-                            to="/"
+                            to={`/${currentDrive}:/`}
                             className="flex items-center space-x-2 text-gray-900 transition-opacity hover:opacity-70 dark:text-white"
                         >
                             <img
@@ -101,15 +101,15 @@ const Navbar = () => {
                                                 key={index}
                                                 onClick={() => switchDrive(index)}
                                                 className={`flex w-full items-center space-x-2.5 px-3 py-2 text-left text-sm transition-colors ${index === currentDrive
-                                                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
-                                                        : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
+                                                    ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                                                    : 'text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
                                                     }`}
                                             >
                                                 <FontAwesomeIcon
                                                     icon="hard-drive"
                                                     className={`h-3.5 w-3.5 ${index === currentDrive
-                                                            ? 'text-blue-500 dark:text-blue-400'
-                                                            : 'text-gray-400 dark:text-gray-500'
+                                                        ? 'text-blue-500 dark:text-blue-400'
+                                                        : 'text-gray-400 dark:text-gray-500'
                                                         }`}
                                                 />
                                                 <span className="flex-1 truncate">{name}</span>
