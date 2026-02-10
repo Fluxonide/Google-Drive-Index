@@ -9,50 +9,9 @@ import RenameModal from './RenameModal'
 import DeleteModal from './DeleteModal'
 import DownloadButtonGroup from './DownloadButtonGroup'
 
-// Helper component for icon with hover thumbnail
-const FileHoverIcon = ({ file, isFolderItem, path, drive, emojiIcon, hasThumbnailFolder }: { file: DriveFile, isFolderItem: boolean, path: string, drive: number, emojiIcon?: string | null, hasThumbnailFolder: boolean }) => {
-    const [isHovering, setIsHovering] = useState(false)
-    const [imgSrc, setImgSrc] = useState<string>('')
-    const [hasError, setHasError] = useState(false)
-
-    // Reset state when file changes
-    useEffect(() => {
-        setIsHovering(false)
-        setHasError(false)
-        setImgSrc('')
-    }, [file.id, path, drive])
-
-    const handleMouseEnter = () => {
-        setIsHovering(true)
-        if (!imgSrc && hasThumbnailFolder) {
-            // Construct custom thumbnail path matches FilePreview logic
-            // Requires "drive:" prefix for worker routing
-            const rawName = file.name.replace(/\.[^/.]+$/, "")
-            // Ensure path doesn't have double slashes
-            let cleanPath = path === '/' ? '' : path
-            if (cleanPath.endsWith('/')) {
-                cleanPath = cleanPath.replace(/\/+$/, '')
-            }
-            // Format: /{drive}:/path/to/.thumbnail/file.jpg
-            const customPath = `/${drive}:${cleanPath}/.thumbnail/${encodeURIComponent(rawName)}.jpg`
-            setImgSrc(customPath)
-        }
-    }
-
-    const handleError = () => {
-        if (!hasError && file.thumbnailLink) {
-            setHasError(true)
-            // Fallback to Google thumbnail
-            setImgSrc(file.thumbnailLink.replace('=s220', '=s400'))
-        }
-    }
-
+const FileHoverIcon = ({ file, isFolderItem, emojiIcon }: { file: DriveFile, isFolderItem: boolean, emojiIcon?: string | null }) => {
     return (
-        <div
-            className="w-5 flex-shrink-0 text-center relative group"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={() => setIsHovering(false)}
-        >
+        <div className="w-5 flex-shrink-0 text-center">
             {emojiIcon ? (
                 <span className="flex h-5 w-5 items-center justify-center text-base leading-none select-none">
                     {emojiIcon}
@@ -62,27 +21,6 @@ const FileHoverIcon = ({ file, isFolderItem, path, drive, emojiIcon, hasThumbnai
                     icon={isFolderItem ? ['far', 'folder'] : getFileIcon(file.mimeType, file.fileExtension)}
                     className={`h-4 w-4 ${isFolderItem ? 'text-gray-500' : 'text-gray-400'}`}
                 />
-            )}
-            {/* Hover Thumbnail - Persisted in DOM to avoid reload flash */}
-            {!isFolderItem && hasThumbnailFolder && (imgSrc || isHovering) && (
-                <div
-                    className={`absolute left-6 top-1/2 -translate-y-1/2 z-[100] w-[220px] rounded-lg shadow-xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden bg-white dark:bg-gray-800 transition-all duration-200 origin-left ${isHovering ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}
-                    style={{ minHeight: '120px' }}
-                >
-                    {imgSrc ? (
-                        <img
-                            src={imgSrc}
-                            alt={file.name}
-                            className="w-full h-auto object-cover"
-                            onError={handleError}
-                        />
-                    ) : (
-                        /* Loading state or empty */
-                        <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-700 min-h-[120px]">
-                            {/* Optional spinner could go here, but preloader makes it fast */}
-                        </div>
-                    )}
-                </div>
             )}
         </div>
     )
@@ -294,42 +232,7 @@ const FileListView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
         }
     }
 
-    // Helper to construct thumbnail path (extracted from FileHoverIcon to be reusable)
-    const getHoverThumbnailPath = (file: DriveFile, path: string, drive: number): string | null => {
-        if (!file.thumbnailLink) return null // Only check if file has a thumbnail link (reusing optimization from earlier)
 
-        const rawName = file.name.replace(/\.[^/.]+$/, "")
-        let cleanPath = path === '/' ? '' : path
-        if (cleanPath.endsWith('/')) {
-            cleanPath = cleanPath.replace(/\/+$/, '')
-        }
-        return `/${drive}:${cleanPath}/.thumbnail/${encodeURIComponent(rawName)}.jpg`
-    }
-
-    // Check if .thumbnail folder exists in this directory
-    const hasThumbnailFolder = files.some(f => isFolder(f.mimeType) && f.name === '.thumbnail')
-
-    // Preload hover thumbnails (only if .thumbnail folder exists)
-    useEffect(() => {
-        if (!hasThumbnailFolder) return // No .thumbnail folder = skip all preloading
-
-        const preloadThumbnails = async () => {
-            const candidates = files.filter(f => !isFolder(f.mimeType))
-
-            for (const file of candidates) {
-                const src = getHoverThumbnailPath(file, path, drive)
-                if (src) {
-                    const img = new Image()
-                    img.src = src
-                    // We don't need to await this, just trigger the fetch
-                }
-            }
-        }
-
-        // Small delay to let the UI render first
-        const timer = setTimeout(preloadThumbnails, 1000)
-        return () => clearTimeout(timer)
-    }, [files, path, drive, hasThumbnailFolder])
 
     const handleDeleteClick = (file: DriveFile) => {
         setFileToDelete(file)
@@ -418,7 +321,7 @@ const FileListView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
                             className={`col-span-12 flex items-center gap-2 px-3 py-2.5 ${showModified ? 'md:col-span-8' : 'md:col-span-9'}`}
                         >
                             <div className="flex-1 flex items-center space-x-2 min-w-0">
-                                <FileHoverIcon file={file} isFolderItem={isFolderItem} path={path} drive={drive} emojiIcon={emoji} hasThumbnailFolder={hasThumbnailFolder} />
+                                <FileHoverIcon file={file} isFolderItem={isFolderItem} emojiIcon={emoji} />
                                 <span className="truncate font-medium text-gray-900 dark:text-white" title={cleanName}>
                                     {cleanName}
                                 </span>
