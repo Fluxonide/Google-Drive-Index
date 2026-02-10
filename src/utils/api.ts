@@ -7,6 +7,20 @@ export const API_BASE = ''
 // Default drive index
 export const DEFAULT_DRIVE = 0
 
+// Mock drive names for local dev
+const MOCK_DRIVE_NAMES = ['My Drive', 'Shared Drive', 'Backup Drive']
+
+/**
+ * Get available drive names from globaly injected config
+ * Falls back to a single default drive name
+ */
+export function getDriveNames(): string[] {
+    if (import.meta.env.DEV) {
+        return MOCK_DRIVE_NAMES
+    }
+    return window.drive_names || ['My Drive']
+}
+
 // Types for API responses
 export interface DriveFile {
     id: string

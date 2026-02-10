@@ -1,5 +1,27 @@
 // Types for Google Drive API responses
 
+// Augment the global Window interface for worker-injected globals
+declare global {
+    interface Window {
+        drive_names: string[]
+        current_drive_order: number
+        SITE_NAME: string
+        UI: {
+            favicon?: string
+            copyright_year?: string
+            company_name?: string
+            downloaddomain?: string
+            show_logout_button?: boolean
+        }
+        MODEL: Record<string, unknown>
+        DRIVE_CONFIG?: {
+            siteName: string
+            driveNames: string[]
+            currentDrive: number
+        }
+    }
+}
+
 export interface DriveFile {
     id: string
     name: string

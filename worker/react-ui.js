@@ -5,7 +5,7 @@
 const CDN_BASE = 'https://raw.githubusercontent.com/Fluxonide/Google-Drive-Index/main/public/build';
 
 // React HTML template that replaces the old Bootstrap UI
-const react_html = (siteName, favicon) => `<!DOCTYPE html>
+const react_html = (siteName, favicon, driveNames = ['My Drive'], currentDriveOrder = 0) => `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -21,11 +21,15 @@ const react_html = (siteName, favicon) => `<!DOCTYPE html>
   <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
     <div id="root"></div>
     <script>
-      // Pass config from worker to React app
+      // Injected by worker — used by the React frontend for multi-drive support
+      window.drive_names = ${JSON.stringify(driveNames)};
+      window.current_drive_order = ${currentDriveOrder};
+      window.SITE_NAME = "${siteName || 'Google Drive Index'}";
+      window.UI = {};
       window.DRIVE_CONFIG = {
-        siteName: "${siteName}",
-        driveNames: window.drive_names || [],
-        currentDrive: window.current_drive_order || 0
+        siteName: "${siteName || 'Google Drive Index'}",
+        driveNames: window.drive_names,
+        currentDrive: window.current_drive_order
       };
     </script>
     <script type="module" src="${CDN_BASE}/index-B_u2MQcR.js"></script>

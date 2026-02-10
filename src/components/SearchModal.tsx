@@ -1,9 +1,9 @@
 import { useState, Fragment, useEffect } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { Dialog, Transition } from '@headlessui/react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { getFileIcon, extractEmojiFromFileName } from '../utils/fileIcons'
-import { searchFiles, isFolder, DEFAULT_DRIVE } from '../utils/api'
+import { searchFiles, isFolder, parsePathInfo, getDriveNames } from '../utils/api'
 import type { DriveFile } from '../types'
 
 interface SearchModalProps {
@@ -18,6 +18,13 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
     const [error, setError] = useState<string | null>(null)
     const [selectedIndex, setSelectedIndex] = useState(-1)
     const navigate = useNavigate()
+    const location = useLocation()
+
+    // Get current drive from URL
+    const { drive: currentDrive } = parsePathInfo(location.pathname)
+    const driveNames = getDriveNames()
+    const currentDriveName = driveNames[currentDrive] || 'Drive'
+    const hasMultipleDrives = driveNames.length > 1
 
     // Reset selected index when results change
     useEffect(() => {
@@ -45,7 +52,7 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
             setError(null)
 
             try {
-                const data = await searchFiles(DEFAULT_DRIVE, query)
+                const data = await searchFiles(currentDrive, query)
                 setResults(data.data?.files || [])
             } catch (err) {
                 setError('Failed to search. Please try again.')
@@ -63,7 +70,7 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
         setQuery('')
         // Navigate to file location
         // For now we just close the modal - proper path building would require parent path from API
-        navigate(`/${DEFAULT_DRIVE}:/${encodeURIComponent(file.name)}${file.mimeType.includes('folder') ? '/' : ''}`)
+        navigate(`/${currentDrive}:/${encodeURIComponent(file.name)}${file.mimeType.includes('folder') ? '/' : ''}`)
     }
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -128,7 +135,7 @@ const SearchModal = ({ isOpen, onClose }: SearchModalProps) => {
                                     <input
                                         type="text"
                                         className="flex-1 bg-transparent px-4 py-4 text-gray-900 placeholder-gray-400 outline-none dark:text-white"
-                                        placeholder="Search files and folders..."
+                                        placeholder={hasMultipleDrives ? `Search in ${currentDriveName}...` : 'Search files and folders...'}
                                         value={query}
                                         onChange={(e) => setQuery(e.target.value)}
                                         onKeyDown={handleKeyDown}
