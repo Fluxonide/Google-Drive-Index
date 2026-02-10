@@ -72,12 +72,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                 const decodedPath = decodeURIComponent(path)
                 const parentPath = decodedPath.substring(0, decodedPath.lastIndexOf(fileName))
 
-                console.log('FilePreview: Path construction', {
-                    rawPath: path,
-                    decodedPath,
-                    fileName,
-                    parentPath
-                })
+
 
                 // Fetch parent folder contents to find this file
                 // Import fetchFolderContents dynamically to avoid circular deps if any, 
@@ -86,11 +81,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                 const folderData = await fetchFolderContents(drive, parentPath)
 
                 // Debug: Log what the API returned
-                console.log('FilePreview: Parent folder API response', {
-                    filesCount: folderData.data?.files?.length || 0,
-                    files: folderData.data?.files?.map(f => ({ name: f.name, size: f.size, modifiedTime: f.modifiedTime })),
-                    searchingFor: fileName
-                })
+
 
                 // Try multiple matching strategies for the filename
                 const decodedFileName = decodeURIComponent(fileName)
@@ -106,10 +97,9 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                 })
 
                 if (foundFile) {
-                    console.log('FilePreview: Found file with full metadata', foundFile)
                     setFileData(foundFile)
                 } else {
-                    console.log('FilePreview: Could not find file in parent folder, using temp data')
+                    // File not found in parent folder, keep temp data
                 }
             } catch (err) {
                 console.error('Failed to load file details:', err)

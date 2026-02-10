@@ -206,7 +206,6 @@ const DownloadButtonGroup = ({
                                                 onClick={(e) => {
                                                     e.preventDefault()
                                                     e.stopPropagation()
-                                                    console.log('Delete clicked')
                                                     if (onDeleteClick) onDeleteClick()
                                                     close()
                                                 }}

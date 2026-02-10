@@ -78,14 +78,12 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
     useEffect(() => {
         if (customPoster) {
             setIsValidatingPoster(true)
-            console.log('VideoPlayer: Checking custom poster...', customPoster)
             fetch(customPoster, { method: 'HEAD' })
                 .then((res) => {
                     if (res.ok && (res.status === 200 || res.status === 304)) {
-                        console.log('VideoPlayer: Custom poster found (HEAD)', customPoster)
                         setEffectivePoster(customPoster)
                     } else {
-                        console.log('VideoPlayer: Custom poster HEAD failed/404, using default')
+                        // Custom poster not found, keep default
                         // No need to reset if it's already poster (default)
                         // But if prop changed, effectivePoster would be stale?
                         // Actually validation usually happens on mount or prop change.
@@ -94,7 +92,7 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
                     }
                 })
                 .catch((e) => {
-                    console.log('VideoPlayer: Custom poster check error', e)
+                    // Custom poster check error, keep default
                 })
                 .finally(() => {
                     setIsValidatingPoster(false)
@@ -124,7 +122,6 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName, poster, custom
                 }
 
                 // Create VideoPlayer instance
-                console.log('VideoPlayer: Init with poster', effectivePoster)
                 playerRef.current = new window.DPlayer({
                     container: containerRef.current,
                     video: {

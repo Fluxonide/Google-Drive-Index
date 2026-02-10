@@ -29,7 +29,6 @@ const MarkdownPreview: FC<MarkdownPreviewProps> = ({ file, basePath, standalone 
                 const text = await response.text()
                 setContent(text)
             } catch (err) {
-                console.error('Failed to load markdown:', err)
                 setError(err instanceof Error ? err.message : 'Failed to load content')
             } finally {
                 setLoading(false)
@@ -49,12 +48,7 @@ const MarkdownPreview: FC<MarkdownPreviewProps> = ({ file, basePath, standalone 
     }
 
     if (error) {
-        return (
-            <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-center dark:border-red-800/50 dark:bg-red-900/20">
-                <FontAwesomeIcon icon="exclamation-triangle" className="mr-2 text-red-500" />
-                <span className="text-red-600 dark:text-red-400">Failed to load README</span>
-            </div>
-        )
+        return null // Silently hide on error — no retry, no error UI
     }
 
     return (
