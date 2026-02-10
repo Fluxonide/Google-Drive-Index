@@ -10,7 +10,7 @@ import DeleteModal from './DeleteModal'
 import DownloadButtonGroup from './DownloadButtonGroup'
 
 // Helper component for icon with hover thumbnail
-const FileHoverIcon = ({ file, isFolderItem, path, drive, emojiIcon }: { file: DriveFile, isFolderItem: boolean, path: string, drive: number, emojiIcon?: string | null }) => {
+const FileHoverIcon = ({ file, isFolderItem, path, drive, emojiIcon, hasThumbnailFolder }: { file: DriveFile, isFolderItem: boolean, path: string, drive: number, emojiIcon?: string | null, hasThumbnailFolder: boolean }) => {
     const [isHovering, setIsHovering] = useState(false)
     const [imgSrc, setImgSrc] = useState<string>('')
     const [hasError, setHasError] = useState(false)
@@ -24,7 +24,7 @@ const FileHoverIcon = ({ file, isFolderItem, path, drive, emojiIcon }: { file: D
 
     const handleMouseEnter = () => {
         setIsHovering(true)
-        if (!imgSrc) {
+        if (!imgSrc && hasThumbnailFolder) {
             // Construct custom thumbnail path matches FilePreview logic
             // Requires "drive:" prefix for worker routing
             const rawName = file.name.replace(/\.[^/.]+$/, "")
@@ -64,7 +64,7 @@ const FileHoverIcon = ({ file, isFolderItem, path, drive, emojiIcon }: { file: D
                 />
             )}
             {/* Hover Thumbnail - Persisted in DOM to avoid reload flash */}
-            {!isFolderItem && (imgSrc || isHovering) && (
+            {!isFolderItem && hasThumbnailFolder && (imgSrc || isHovering) && (
                 <div
                     className={`absolute left-6 top-1/2 -translate-y-1/2 z-[100] w-[220px] rounded-lg shadow-xl ring-1 ring-black/5 dark:ring-white/10 overflow-hidden bg-white dark:bg-gray-800 transition-all duration-200 origin-left ${isHovering ? 'opacity-100 scale-100 visible' : 'opacity-0 scale-95 invisible'}`}
                     style={{ minHeight: '120px' }}
@@ -306,12 +306,14 @@ const FileListView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
         return `/${drive}:${cleanPath}/.thumbnail/${encodeURIComponent(rawName)}.jpg`
     }
 
-    // Preload hover thumbnails
+    // Check if .thumbnail folder exists in this directory
+    const hasThumbnailFolder = files.some(f => isFolder(f.mimeType) && f.name === '.thumbnail')
+
+    // Preload hover thumbnails (only if .thumbnail folder exists)
     useEffect(() => {
+        if (!hasThumbnailFolder) return // No .thumbnail folder = skip all preloading
+
         const preloadThumbnails = async () => {
-            // Select candidates: not folders, and preferably have a thumbnail link to avoid mass 404s on generic files?
-            // User said "LOAD ALL".
-            // If I just loop all non-folders it should be fine.
             const candidates = files.filter(f => !isFolder(f.mimeType))
 
             for (const file of candidates) {
@@ -327,7 +329,7 @@ const FileListView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
         // Small delay to let the UI render first
         const timer = setTimeout(preloadThumbnails, 1000)
         return () => clearTimeout(timer)
-    }, [files, path, drive])
+    }, [files, path, drive, hasThumbnailFolder])
 
     const handleDeleteClick = (file: DriveFile) => {
         setFileToDelete(file)
@@ -416,7 +418,7 @@ const FileListView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
                             className={`col-span-12 flex items-center gap-2 px-3 py-2.5 ${showModified ? 'md:col-span-8' : 'md:col-span-9'}`}
                         >
                             <div className="flex-1 flex items-center space-x-2 min-w-0">
-                                <FileHoverIcon file={file} isFolderItem={isFolderItem} path={path} drive={drive} emojiIcon={emoji} />
+                                <FileHoverIcon file={file} isFolderItem={isFolderItem} path={path} drive={drive} emojiIcon={emoji} hasThumbnailFolder={hasThumbnailFolder} />
                                 <span className="truncate font-medium text-gray-900 dark:text-white" title={cleanName}>
                                     {cleanName}
                                 </span>

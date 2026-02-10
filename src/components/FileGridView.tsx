@@ -24,7 +24,8 @@ const FileGridItem = ({
     onDeleteClick,
     getItemPath,
     getFileDownloadUrl,
-    emojiIcon
+    emojiIcon,
+    hasThumbnailFolder
 }: {
     file: DriveFile
     onFileClick: (file: DriveFile) => void
@@ -33,13 +34,14 @@ const FileGridItem = ({
     getItemPath: (file: DriveFile) => string
     getFileDownloadUrl: (file: DriveFile) => string
     emojiIcon?: string | null
+    hasThumbnailFolder: boolean
 }) => {
     const location = useLocation()
     const isVideo = file.mimeType.startsWith('video/')
     const isImageFile = file.mimeType.startsWith('image/')
 
     const getCustomThumbnailUrl = () => {
-        if (!isVideo) return null
+        if (!isVideo || !hasThumbnailFolder) return null
         const basePath = location.pathname.endsWith('/') ? location.pathname : location.pathname + '/'
         const fileNameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.')) || file.name
         // Assume the custom thumbnail is a jpg in .thumbnail folder
@@ -210,6 +212,9 @@ const FileGridView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
         return a.name.localeCompare(b.name)
     })
 
+    // Check if .thumbnail folder exists in this directory
+    const hasThumbnailFolder = files.some(f => isFolder(f.mimeType) && f.name === '.thumbnail')
+
     const handleRenameClick = (file: DriveFile) => {
         setFileToRename(file)
         setRenameModalOpen(true)
@@ -253,6 +258,7 @@ const FileGridView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
                         getFileDownloadUrl={getFileDownloadUrl}
                         emojiIcon={emoji}
                         onDeleteClick={handleDeleteClick}
+                        hasThumbnailFolder={hasThumbnailFolder}
                     />
                 )
             })}
