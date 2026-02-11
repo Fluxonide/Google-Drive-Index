@@ -19,6 +19,8 @@ declare global {
 const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName }) => {
     const containerRef = useRef<HTMLDivElement>(null)
     const playerRef = useRef<any>(null)
+    const retryCountRef = useRef<number>(0)
+    const MAX_RETRIES = 3
 
     const [resourcesLoaded, setResourcesLoaded] = useState<boolean>(false)
     const [videoError, setVideoError] = useState<string | null>(null)
@@ -77,8 +79,9 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName }) => {
                     playerRef.current.destroy()
                 }
 
-                // Reset error state on new init
+                // Reset error state and retry count on new init
                 setVideoError(null)
+                retryCountRef.current = 0
 
                 // Create VideoPlayer instance
                 const dp = new window.DPlayer({
@@ -93,7 +96,7 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName }) => {
                     lang: 'en',
                     screenshot: true,
                     hotkey: true,
-                    preload: 'auto',
+                    preload: 'metadata',
                     volume: 0.7,
                     playbackSpeed: [0.5, 0.75, 1, 1.25, 1.5, 2],
                     contextmenu: [
@@ -106,9 +109,20 @@ const VideoPlayer: FC<VideoPlayerProps> = ({ videoUrl, videoName }) => {
 
                 playerRef.current = dp
 
-                // Listen for video errors to show a user-friendly message
+                // Auto-retry on transient errors (connection resets, 500s, etc.)
                 dp.on('error', () => {
-                    if (mounted) {
+                    if (!mounted) return
+                    if (retryCountRef.current < MAX_RETRIES) {
+                        retryCountRef.current++
+                        console.warn(`VideoPlayer: error #${retryCountRef.current}, retrying in 2s...`)
+                        setTimeout(() => {
+                            if (!mounted || !playerRef.current) return
+                            // Append cache-busting param to force a fresh request
+                            const bustUrl = videoUrl + (videoUrl.includes('?') ? '&' : '?') + '_t=' + Date.now()
+                            playerRef.current.switchVideo({ url: bustUrl })
+                            playerRef.current.play()
+                        }, 2000)
+                    } else {
                         setVideoError('Video failed to load. The server returned an error — try refreshing or downloading the file instead.')
                     }
                 })
