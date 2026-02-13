@@ -259,8 +259,8 @@ const FileListView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
     return (
         <div className="rounded bg-white shadow-sm dark:bg-[#18181B] dark:text-gray-100">
             {/* Header */}
-            <div className="grid grid-cols-12 items-center gap-2 border-b border-gray-900/10 px-3 py-2 dark:border-gray-500/30">
-                <div className={`col-span-12 flex items-center gap-2 ${showModified ? 'md:col-span-8' : 'md:col-span-9'}`}>
+            <div className="grid grid-cols-12 items-center gap-2 border-b border-gray-900/10 py-2 dark:border-gray-500/30">
+                <div className={`col-span-12 flex items-center gap-2 px-3 ${showModified ? 'md:col-span-8' : 'md:col-span-9'}`}>
                     <div className="flex-1 text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 truncate">
                         Name
                     </div>
@@ -270,9 +270,9 @@ const FileListView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
                         </div>
                     )}
                 </div>
-                <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:col-span-3 md:flex items-center justify-end gap-4 pr-3">
-                    <span className="w-[80px] text-center">Size</span>
-                    <span className="w-[150px] text-right">Actions</span>
+                <div className="hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:col-span-3 md:flex items-center justify-end gap-2 pr-3">
+                    <span className="w-[95px] flex-shrink-0 text-left tracking-normal">Size</span>
+                    <span className="w-[120px] flex-shrink-0 text-right">Actions</span>
                 </div>
                 <div className={`hidden text-xs font-bold uppercase tracking-widest text-gray-600 dark:text-gray-300 md:col-span-1 ${showModified ? 'md:block' : 'hidden'}`}>
                     {/* Bulk actions */}
@@ -334,11 +334,11 @@ const FileListView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
                         </Link>
 
                         {/* Merged Size & Actions column */}
-                        <div className="hidden md:col-span-3 md:flex items-center justify-end gap-4 pr-3">
-                            <div className="w-[80px] flex-shrink-0 font-mono text-sm text-gray-700 dark:text-gray-500 text-left">
-                                {formatFileSize(file.size) || '—'}
+                        <div className="hidden md:col-span-3 md:flex items-center justify-end gap-2 pr-3">
+                            <div className={`w-[95px] flex-shrink-0 font-mono text-sm text-gray-700 dark:text-gray-500 whitespace-nowrap text-left ${isFolderItem ? 'pl-3' : ''}`}>
+                                {isFolderItem ? '—' : (formatFileSize(file.size) || '—')}
                             </div>
-                            <div className="flex items-center justify-end space-x-1 text-gray-700 dark:text-gray-400 w-[150px]">
+                            <div className="flex items-center justify-end space-x-1 text-gray-700 dark:text-gray-400 w-[120px] flex-shrink-0">
                                 {!isFolderItem && (
                                     <span
                                         title="Preview file"
