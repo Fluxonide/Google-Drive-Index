@@ -1,8 +1,74 @@
 import { useState, useEffect } from 'react'
-import { LightAsync as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { tomorrowNightEighties } from 'react-syntax-highlighter/dist/esm/styles/hljs'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { getLanguageByFileName } from '../../utils/getPreviewType'
+
+// Register only the languages we actually need — no more 180+ chunk files
+import javascript from 'react-syntax-highlighter/dist/esm/languages/hljs/javascript'
+import typescript from 'react-syntax-highlighter/dist/esm/languages/hljs/typescript'
+import python from 'react-syntax-highlighter/dist/esm/languages/hljs/python'
+import java from 'react-syntax-highlighter/dist/esm/languages/hljs/java'
+import c from 'react-syntax-highlighter/dist/esm/languages/hljs/c'
+import cpp from 'react-syntax-highlighter/dist/esm/languages/hljs/cpp'
+import csharp from 'react-syntax-highlighter/dist/esm/languages/hljs/csharp'
+import go from 'react-syntax-highlighter/dist/esm/languages/hljs/go'
+import rust from 'react-syntax-highlighter/dist/esm/languages/hljs/rust'
+import ruby from 'react-syntax-highlighter/dist/esm/languages/hljs/ruby'
+import php from 'react-syntax-highlighter/dist/esm/languages/hljs/php'
+import swift from 'react-syntax-highlighter/dist/esm/languages/hljs/swift'
+import kotlin from 'react-syntax-highlighter/dist/esm/languages/hljs/kotlin'
+import dart from 'react-syntax-highlighter/dist/esm/languages/hljs/dart'
+import shell from 'react-syntax-highlighter/dist/esm/languages/hljs/shell'
+import bash from 'react-syntax-highlighter/dist/esm/languages/hljs/bash'
+import powershell from 'react-syntax-highlighter/dist/esm/languages/hljs/powershell'
+import sql from 'react-syntax-highlighter/dist/esm/languages/hljs/sql'
+import json from 'react-syntax-highlighter/dist/esm/languages/hljs/json'
+import xml from 'react-syntax-highlighter/dist/esm/languages/hljs/xml'
+import css from 'react-syntax-highlighter/dist/esm/languages/hljs/css'
+import scss from 'react-syntax-highlighter/dist/esm/languages/hljs/scss'
+import less from 'react-syntax-highlighter/dist/esm/languages/hljs/less'
+import yaml from 'react-syntax-highlighter/dist/esm/languages/hljs/yaml'
+import ini from 'react-syntax-highlighter/dist/esm/languages/hljs/ini'
+import dockerfile from 'react-syntax-highlighter/dist/esm/languages/hljs/dockerfile'
+import makefile from 'react-syntax-highlighter/dist/esm/languages/hljs/makefile'
+import lua from 'react-syntax-highlighter/dist/esm/languages/hljs/lua'
+import perl from 'react-syntax-highlighter/dist/esm/languages/hljs/perl'
+import r from 'react-syntax-highlighter/dist/esm/languages/hljs/r'
+import dos from 'react-syntax-highlighter/dist/esm/languages/hljs/dos'
+
+SyntaxHighlighter.registerLanguage('javascript', javascript)
+SyntaxHighlighter.registerLanguage('typescript', typescript)
+SyntaxHighlighter.registerLanguage('python', python)
+SyntaxHighlighter.registerLanguage('java', java)
+SyntaxHighlighter.registerLanguage('c', c)
+SyntaxHighlighter.registerLanguage('cpp', cpp)
+SyntaxHighlighter.registerLanguage('csharp', csharp)
+SyntaxHighlighter.registerLanguage('go', go)
+SyntaxHighlighter.registerLanguage('rust', rust)
+SyntaxHighlighter.registerLanguage('ruby', ruby)
+SyntaxHighlighter.registerLanguage('php', php)
+SyntaxHighlighter.registerLanguage('swift', swift)
+SyntaxHighlighter.registerLanguage('kotlin', kotlin)
+SyntaxHighlighter.registerLanguage('dart', dart)
+SyntaxHighlighter.registerLanguage('shell', shell)
+SyntaxHighlighter.registerLanguage('bash', bash)
+SyntaxHighlighter.registerLanguage('powershell', powershell)
+SyntaxHighlighter.registerLanguage('sql', sql)
+SyntaxHighlighter.registerLanguage('json', json)
+SyntaxHighlighter.registerLanguage('xml', xml)
+SyntaxHighlighter.registerLanguage('html', xml)  // HTML uses XML highlighter
+SyntaxHighlighter.registerLanguage('css', css)
+SyntaxHighlighter.registerLanguage('scss', scss)
+SyntaxHighlighter.registerLanguage('less', less)
+SyntaxHighlighter.registerLanguage('yaml', yaml)
+SyntaxHighlighter.registerLanguage('ini', ini)
+SyntaxHighlighter.registerLanguage('dockerfile', dockerfile)
+SyntaxHighlighter.registerLanguage('makefile', makefile)
+SyntaxHighlighter.registerLanguage('lua', lua)
+SyntaxHighlighter.registerLanguage('perl', perl)
+SyntaxHighlighter.registerLanguage('r', r)
+SyntaxHighlighter.registerLanguage('dos', dos)
 
 interface CodePreviewProps {
     fileUrl: string
