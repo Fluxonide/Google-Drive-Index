@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 interface DownloadButtonGroupProps {
     downloadUrl: string
     fileName: string
-    onCustomizeClick?: () => void
+    onGenerateLinkClick?: () => Promise<void>
     onRenameClick?: () => void
     color?: 'gray' | 'white'
     isFolder?: boolean
@@ -17,7 +17,7 @@ interface DownloadButtonGroupProps {
 const DownloadButtonGroup = ({
     downloadUrl,
     fileName,
-    onCustomizeClick,
+    onGenerateLinkClick,
     onRenameClick,
     color = 'gray',
     isFolder = false,
@@ -26,6 +26,7 @@ const DownloadButtonGroup = ({
 }: DownloadButtonGroupProps) => {
     const [menuPosition, setMenuPosition] = useState<'up' | 'down'>('down')
     const buttonRef = useRef<HTMLButtonElement>(null)
+    const [generatingLink, setGeneratingLink] = useState(false)
 
     const handleTriggerClick = () => {
         if (buttonRef.current) {
@@ -86,13 +87,17 @@ const DownloadButtonGroup = ({
                     <FontAwesomeIcon icon="copy" />
                     <span>{isFolder ? 'Copy Folder Link' : 'Copy Direct Link'}</span>
                 </button>
-                {onCustomizeClick && (
+                {onGenerateLinkClick && (
                     <button
-                        onClick={onCustomizeClick}
+                        onClick={async () => {
+                            setGeneratingLink(true)
+                            try { await onGenerateLinkClick() } finally { setGeneratingLink(false) }
+                        }}
+                        disabled={generatingLink}
                         className={`${baseBtnClass} ${colorMap.teal}`}
                     >
-                        <FontAwesomeIcon icon="pen" />
-                        <span>Customize Link</span>
+                        <FontAwesomeIcon icon={generatingLink ? 'spinner' : 'link'} spin={generatingLink} />
+                        <span>{generatingLink ? 'Generating...' : 'Generate Link'}</span>
                     </button>
                 )}
                 {onRenameClick && (
@@ -174,23 +179,27 @@ const DownloadButtonGroup = ({
                                     )}
                                 </Menu.Item>
                             </div>
-                            {(onCustomizeClick || onRenameClick) && (
+                            {(onGenerateLinkClick || onRenameClick) && (
                                 <div className="px-1 py-1">
-                                    {onCustomizeClick && (
+                                    {onGenerateLinkClick && (
                                         <Menu.Item>
                                             {({ active }) => (
                                                 <button
-                                                    onClick={(e) => {
+                                                    onClick={async (e) => {
                                                         e.preventDefault()
                                                         e.stopPropagation()
-                                                        if (onCustomizeClick) onCustomizeClick()
+                                                        if (onGenerateLinkClick) {
+                                                            setGeneratingLink(true)
+                                                            try { await onGenerateLinkClick() } finally { setGeneratingLink(false) }
+                                                        }
                                                         close()
                                                     }}
+                                                    disabled={generatingLink}
                                                     className={`${active ? 'bg-gray-100 dark:bg-gray-700' : ''
                                                         } text-gray-900 dark:text-gray-100 group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                                                 >
-                                                    <FontAwesomeIcon icon="pen" className="mr-2 h-4 w-4" />
-                                                    Customize Link
+                                                    <FontAwesomeIcon icon={generatingLink ? 'spinner' : 'link'} spin={generatingLink} className="mr-2 h-4 w-4" />
+                                                    {generatingLink ? 'Generating...' : 'Generate Link'}
                                                 </button>
                                             )}
                                         </Menu.Item>
