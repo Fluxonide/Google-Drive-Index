@@ -16,8 +16,10 @@ import { renameFile, parsePathInfo, generateAspxLink } from '../../utils/api'
 
 import VideoPlayer from './VideoPlayer'
 import AudioPlayer from './AudioPlayer'
+import CodePreview from './CodePreview'
 import Breadcrumb from '../Breadcrumb'
 import { PreviewContainer, DownloadBtnContainer } from './Containers'
+import { isCodeFile } from '../../utils/getPreviewType'
 
 interface FilePreviewProps {
     file?: DriveFile
@@ -209,6 +211,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
     const isAudio = fileData?.mimeType?.startsWith('audio/')
     const isImage = fileData?.mimeType?.startsWith('image/')
     const isPDF = fileData?.mimeType === 'application/pdf'
+    const isCode = fileData ? isCodeFile(fileData.name) : false
 
     const downloadUrl = fileData?.link || location.pathname.replace(/\/$/, '')
 
@@ -291,6 +294,10 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                     />
                 </div>
             )
+        }
+
+        if (isCode) {
+            return <CodePreview fileUrl={downloadUrl} fileName={name} />
         }
 
         return <DefaultPreviewContent />
