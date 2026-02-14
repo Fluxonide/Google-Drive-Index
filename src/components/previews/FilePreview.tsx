@@ -271,6 +271,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                     audioUrl={downloadUrl}
                     fileName={name}
                     modifiedTime={fileData?.modifiedTime}
+                    thumbnailUrl={fileData?.thumbnailLink}
                 />
             )
         }
