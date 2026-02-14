@@ -49,7 +49,8 @@ const DownloadButtonGroup = ({
     }
 
     const getFullUrl = () => {
-        return `${window.location.origin}${downloadUrl}`
+        const url = `${window.location.origin}${downloadUrl}`
+        return isFolder && !url.endsWith('/') ? `${url}/` : url
     }
 
     const buttonClass = color === 'white'
