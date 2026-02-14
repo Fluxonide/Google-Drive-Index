@@ -312,6 +312,43 @@ export async function deleteFile(
 }
 
 /**
+ * Generate an expiring ASPX download link for a file
+ * Returns the full URL with encrypted file ID, expiry, and HMAC
+ */
+export async function generateAspxLink(
+    drive: number,
+    fileId: string
+): Promise<string> {
+    // MOCK DATA FOR LOCAL DEV
+    if (import.meta.env.DEV) {
+        console.log('Generating ASPX link in DEV mode', fileId)
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(`${window.location.origin}/download.aspx?file=mock_encrypted&expiry=mock_expiry&mac=mock_hmac`)
+            }, 500)
+        })
+    }
+
+    const response = await fetch(`${API_BASE}/${drive}:generate-aspx-link`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            id: fileId,
+        }),
+    })
+
+    if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Unknown error' }))
+        throw new Error(error.message || `Link generation failed: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return `${window.location.origin}${data.url}`
+}
+
+/**
  * Get download URL for a file (raw/direct download)
  */
 export function getDownloadUrl(drive: number, path: string, filename: string): string {
