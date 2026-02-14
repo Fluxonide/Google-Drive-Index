@@ -132,8 +132,8 @@ const FileGridItem = ({
                 <DownloadButtonGroup
                     downloadUrl={getFileDownloadUrl(file)}
                     fileName={file.name}
-                    onRenameClick={() => onRenameClick(file)}
-                    onDeleteClick={() => onDeleteClick(file)}
+                    onRenameClick={window.UI?.enable_rename ? () => onRenameClick(file) : undefined}
+                    onDeleteClick={window.UI?.enable_delete ? () => onDeleteClick(file) : undefined}
                     color="white"
                     isFolder={isFolder(file.mimeType)}
                 />
