@@ -129,6 +129,14 @@ export const MOCK_FILES: DriveFile[] = [
         modifiedTime: new Date().toISOString(),
         // For local dev, this will fetch from the project root README
         link: '/README.md'
+    },
+    {
+        id: 'code1',
+        name: 'sample-code.js',
+        mimeType: 'application/javascript',
+        size: '2100',
+        modifiedTime: new Date().toISOString(),
+        link: '/sample-code.js'
     }
 ]
 
