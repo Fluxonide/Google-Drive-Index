@@ -8,11 +8,6 @@ interface VideoPlayerProps {
 declare global {
     interface Window {
         DPlayer: any
-        UI: {
-            player_js?: string
-            player_css?: string
-            [key: string]: any
-        }
     }
 }
 

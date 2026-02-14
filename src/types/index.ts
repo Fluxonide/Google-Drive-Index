@@ -12,6 +12,10 @@ declare global {
             company_name?: string
             downloaddomain?: string
             show_logout_button?: boolean
+            enable_delete?: boolean
+            enable_rename?: boolean
+            player_js?: string
+            player_css?: string
         }
         MODEL: Record<string, unknown>
         DRIVE_CONFIG?: {
