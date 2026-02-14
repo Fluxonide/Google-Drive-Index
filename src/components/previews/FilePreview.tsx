@@ -17,6 +17,7 @@ import { renameFile, parsePathInfo, generateAspxLink } from '../../utils/api'
 import VideoPlayer from './VideoPlayer'
 import AudioPlayer from './AudioPlayer'
 import CodePreview from './CodePreview'
+import NotebookPreview from './NotebookPreview'
 import Breadcrumb from '../Breadcrumb'
 import { PreviewContainer, DownloadBtnContainer } from './Containers'
 import { isCodeFile } from '../../utils/getPreviewType'
@@ -212,6 +213,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
     const isImage = fileData?.mimeType?.startsWith('image/')
     const isPDF = fileData?.mimeType === 'application/pdf'
     const isCode = fileData ? isCodeFile(fileData.name) : false
+    const isNotebook = fileData?.name?.toLowerCase().endsWith('.ipynb')
 
     const downloadUrl = fileData?.link || location.pathname.replace(/\/$/, '')
 
@@ -294,6 +296,10 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                     />
                 </div>
             )
+        }
+
+        if (isNotebook) {
+            return <NotebookPreview fileUrl={downloadUrl} fileName={name} />
         }
 
         if (isCode) {

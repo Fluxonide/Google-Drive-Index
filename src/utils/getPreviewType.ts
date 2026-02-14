@@ -1,6 +1,6 @@
 /**
  * Code file detection and language mapping for syntax highlighting.
- * Languages are loaded asynchronously by react-syntax-highlighter (hljs).
+ * Languages use Prism identifiers (prism-react-renderer).
  */
 
 const CODE_EXTENSIONS = new Set([
@@ -45,7 +45,7 @@ export function getLanguageByFileName(filename: string): string {
         case 'sh':
         case 'bash':
         case 'zsh':
-            return 'shell'
+            return 'bash'
         case 'cs':
             return 'csharp'
         case 'py':
@@ -72,7 +72,7 @@ export function getLanguageByFileName(filename: string): string {
             return 'powershell'
         case 'bat':
         case 'cmd':
-            return 'dos'
+            return 'bash'
         case 'env':
         case 'ini':
             return 'ini'
