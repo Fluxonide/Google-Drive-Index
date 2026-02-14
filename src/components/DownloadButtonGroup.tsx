@@ -58,42 +58,59 @@ const DownloadButtonGroup = ({
         : "inline-flex w-full justify-center rounded-full p-2 text-sm font-medium text-gray-500 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 dark:text-gray-400 dark:hover:bg-gray-800"
 
     if (layout === 'buttons') {
-        const btnClass = "inline-flex items-center gap-2 rounded px-3 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700"
+        const baseBtnClass = "flex items-center space-x-2 rounded-lg border bg-white py-2 px-4 text-sm font-medium text-gray-900 hover:bg-gray-100/10 focus:z-10 focus:ring-2 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-900"
+
+        const colorMap: Record<string, string> = {
+            blue: 'hover:text-blue-600 focus:ring-blue-200 focus:text-blue-600 border-blue-300 dark:border-blue-700 dark:focus:ring-blue-500',
+            pink: 'hover:text-pink-600 focus:ring-pink-200 focus:text-pink-600 border-pink-300 dark:border-pink-700 dark:focus:ring-pink-500',
+            teal: 'hover:text-teal-600 focus:ring-teal-200 focus:text-teal-600 border-teal-300 dark:border-teal-700 dark:focus:ring-teal-500',
+            yellow: 'hover:text-yellow-400 focus:ring-yellow-100 focus:text-yellow-400 border-yellow-300 dark:border-yellow-400 dark:focus:ring-yellow-300',
+            red: 'hover:text-red-600 focus:ring-red-200 focus:text-red-600 border-red-300 dark:border-red-700 dark:focus:ring-red-500',
+        }
 
         return (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap justify-center gap-2">
                 {!isFolder && (
                     <button
                         onClick={() => window.open(downloadUrl, '_blank')}
-                        className={`${btnClass} bg-gray-900 text-white hover:bg-black border-transparent dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200`}
+                        className={`${baseBtnClass} ${colorMap.blue}`}
                     >
                         <FontAwesomeIcon icon="file-download" />
-                        Download
+                        <span>Download</span>
                     </button>
                 )}
                 <button
                     onClick={() => copyToClipboard(getFullUrl())}
-                    className={btnClass}
+                    className={`${baseBtnClass} ${colorMap.pink}`}
                 >
                     <FontAwesomeIcon icon="copy" />
-                    {isFolder ? 'Copy Folder Link' : 'Copy Direct Link'}
+                    <span>{isFolder ? 'Copy Folder Link' : 'Copy Direct Link'}</span>
                 </button>
                 {onCustomizeClick && (
                     <button
                         onClick={onCustomizeClick}
-                        className={btnClass}
+                        className={`${baseBtnClass} ${colorMap.teal}`}
                     >
                         <FontAwesomeIcon icon="pen" />
-                        Customize Link
+                        <span>Customize Link</span>
                     </button>
                 )}
                 {onRenameClick && (
                     <button
                         onClick={onRenameClick}
-                        className={btnClass}
+                        className={`${baseBtnClass} ${colorMap.yellow}`}
                     >
                         <FontAwesomeIcon icon="edit" />
-                        Rename
+                        <span>Rename</span>
+                    </button>
+                )}
+                {onDeleteClick && (
+                    <button
+                        onClick={onDeleteClick}
+                        className={`${baseBtnClass} ${colorMap.red}`}
+                    >
+                        <FontAwesomeIcon icon="trash" />
+                        <span>Delete</span>
                     </button>
                 )}
             </div>

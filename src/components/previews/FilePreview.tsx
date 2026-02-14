@@ -359,6 +359,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                                 fileName={fileData?.name || 'file'}
                                 onCustomizeClick={() => setCustomizeOpen(true)}
                                 onRenameClick={window.UI?.enable_rename && fileData ? () => setRenameOpen(true) : undefined}
+                                layout="buttons"
                             />
                         </div>
                     </div>
@@ -374,6 +375,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                             fileName={fileData?.name || 'file'}
                             onCustomizeClick={() => setCustomizeOpen(true)}
                             onRenameClick={window.UI?.enable_rename && fileData ? () => setRenameOpen(true) : undefined}
+                            layout="buttons"
                         />
                     </DownloadBtnContainer>
                 </>
