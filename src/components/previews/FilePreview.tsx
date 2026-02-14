@@ -11,9 +11,8 @@ import type { DriveFile } from '../../types'
 import { MOCK_FILES } from '../../utils/api'
 import toast from 'react-hot-toast'
 import DownloadButtonGroup from '../DownloadButtonGroup'
-import CustomEmbedLinkMenu from '../CustomEmbedLinkMenu'
 import RenameModal from '../RenameModal'
-import { renameFile, parsePathInfo } from '../../utils/api'
+import { renameFile, parsePathInfo, generateAspxLink } from '../../utils/api'
 
 import VideoPlayer from './VideoPlayer'
 import AudioPlayer from './AudioPlayer'
@@ -30,7 +29,6 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
     const navigate = useNavigate()
     const [fileData, setFileData] = useState<DriveFile | null>(file || null)
     const [loading, setLoading] = useState(!file)
-    const [customizeOpen, setCustomizeOpen] = useState(false)
     const [renameOpen, setRenameOpen] = useState(false)
 
     // If no file prop, fetch from current path
@@ -357,7 +355,12 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                             <DownloadButtonGroup
                                 downloadUrl={downloadUrl}
                                 fileName={fileData?.name || 'file'}
-                                onCustomizeClick={() => setCustomizeOpen(true)}
+                                onGenerateLinkClick={fileData?.id ? async () => {
+                                    const { drive } = parsePathInfo(location.pathname)
+                                    const url = await generateAspxLink(drive, fileData.id)
+                                    await navigator.clipboard.writeText(url)
+                                    toast.success('Expiring link copied to clipboard!')
+                                } : undefined}
                                 onRenameClick={window.UI?.enable_rename && fileData ? () => setRenameOpen(true) : undefined}
                                 layout="buttons"
                             />
@@ -373,7 +376,12 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
                         <DownloadButtonGroup
                             downloadUrl={downloadUrl}
                             fileName={fileData?.name || 'file'}
-                            onCustomizeClick={() => setCustomizeOpen(true)}
+                            onGenerateLinkClick={fileData?.id ? async () => {
+                                const { drive } = parsePathInfo(location.pathname)
+                                const url = await generateAspxLink(drive, fileData.id)
+                                await navigator.clipboard.writeText(url)
+                                toast.success('Expiring link copied to clipboard!')
+                            } : undefined}
                             onRenameClick={window.UI?.enable_rename && fileData ? () => setRenameOpen(true) : undefined}
                             layout="buttons"
                         />
@@ -387,12 +395,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
     if (file && onClose) {
         return (
             <>
-                <CustomEmbedLinkMenu
-                    path={downloadUrl}
-                    fileName={fileData?.name || 'file'}
-                    menuOpen={customizeOpen}
-                    setMenuOpen={setCustomizeOpen}
-                />
+
                 <RenameModal
                     isOpen={renameOpen}
                     currentName={fileData?.name || ''}
@@ -451,12 +454,7 @@ const FilePreview = ({ file, onClose }: FilePreviewProps) => {
     // Full page view (direct path navigation)
     return (
         <>
-            <CustomEmbedLinkMenu
-                path={downloadUrl}
-                fileName={fileData?.name || 'file'}
-                menuOpen={customizeOpen}
-                setMenuOpen={setCustomizeOpen}
-            />
+
             <RenameModal
                 isOpen={renameOpen}
                 currentName={fileData?.name || ''}
