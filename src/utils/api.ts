@@ -315,8 +315,7 @@ export async function deleteFile(
  * Get download URL for a file (raw/direct download)
  */
 export function getDownloadUrl(drive: number, path: string, filename: string): string {
-    const encodedPath = path === '/' ? '' : path
-    return `${API_BASE}/${drive}:${encodedPath}${encodeURIComponent(filename)}`
+    return `${API_BASE}/${drive}:${path}${encodeURIComponent(filename)}`
 }
 
 /**
