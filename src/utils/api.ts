@@ -329,7 +329,7 @@ export async function generateAspxLink(
         })
     }
 
-    const response = await fetch(`${API_BASE}/${drive}:generate-aspx-link`, {
+    const response = await fetch(`${API_BASE}/${drive}:generateaspxlink`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
