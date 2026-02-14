@@ -59,7 +59,7 @@ const DownloadButtonGroup = ({
         : "inline-flex w-full justify-center rounded-full p-2 text-sm font-medium text-gray-500 hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-500 dark:text-gray-400 dark:hover:bg-gray-800"
 
     if (layout === 'buttons') {
-        const baseBtnClass = "flex items-center space-x-2 rounded-lg border bg-white py-2 px-4 text-sm font-medium text-gray-900 hover:bg-gray-100/10 focus:z-10 focus:ring-2 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-900"
+        const baseBtnClass = "flex items-center space-x-2 rounded-lg border bg-white py-2 px-4 text-sm font-medium text-gray-900 whitespace-nowrap hover:bg-gray-100/10 focus:z-10 focus:ring-2 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-900"
 
         const colorMap: Record<string, string> = {
             blue: 'hover:text-blue-600 focus:ring-blue-200 focus:text-blue-600 border-blue-300 dark:border-blue-700 dark:focus:ring-blue-500',
@@ -70,7 +70,7 @@ const DownloadButtonGroup = ({
         }
 
         return (
-            <div className="flex flex-wrap justify-center gap-2">
+            <div className="flex flex-nowrap justify-center gap-2 overflow-x-auto">
                 {!isFolder && (
                     <button
                         onClick={() => window.open(downloadUrl, '_blank')}
