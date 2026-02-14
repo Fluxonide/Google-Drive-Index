@@ -97,7 +97,7 @@ const DownloadButtonGroup = ({
                         className={`${baseBtnClass} ${colorMap.teal}`}
                     >
                         <FontAwesomeIcon icon={generatingLink ? 'spinner' : 'link'} spin={generatingLink} />
-                        <span>{generatingLink ? 'Generating...' : 'Generate Link'}</span>
+                        <span>{generatingLink ? 'Generating...' : 'Protected Link'}</span>
                     </button>
                 )}
                 {onRenameClick && (
@@ -199,7 +199,7 @@ const DownloadButtonGroup = ({
                                                         } text-gray-900 dark:text-gray-100 group flex w-full items-center rounded-md px-2 py-2 text-sm`}
                                                 >
                                                     <FontAwesomeIcon icon={generatingLink ? 'spinner' : 'link'} spin={generatingLink} className="mr-2 h-4 w-4" />
-                                                    {generatingLink ? 'Generating...' : 'Generate Link'}
+                                                    {generatingLink ? 'Generating...' : 'Protected Link'}
                                                 </button>
                                             )}
                                         </Menu.Item>
