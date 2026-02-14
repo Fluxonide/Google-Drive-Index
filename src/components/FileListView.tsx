@@ -352,8 +352,8 @@ const FileListView = ({ files, onFileClick, onRenameSuccess, onDeleteSuccess }: 
                                     <DownloadButtonGroup
                                         downloadUrl={getFileDownloadUrl(file)}
                                         fileName={file.name}
-                                        onRenameClick={() => handleRenameClick(file)}
-                                        onDeleteClick={() => handleDeleteClick(file)}
+                                        onRenameClick={window.UI?.enable_rename ? () => handleRenameClick(file) : undefined}
+                                        onDeleteClick={window.UI?.enable_delete ? () => handleDeleteClick(file) : undefined}
                                         isFolder={isFolderItem}
                                     />
                                 </div>
