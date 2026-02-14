@@ -7,6 +7,7 @@ interface AudioPlayerProps {
     audioUrl: string
     fileName: string
     modifiedTime?: string
+    thumbnailUrl?: string
 }
 
 enum PlayerState {
@@ -16,10 +17,11 @@ enum PlayerState {
     Paused,
 }
 
-const AudioPlayer: FC<AudioPlayerProps> = ({ audioUrl, fileName, modifiedTime }) => {
+const AudioPlayer: FC<AudioPlayerProps> = ({ audioUrl, fileName, modifiedTime, thumbnailUrl }) => {
     const rapRef = useRef<ReactAudioPlayer>(null)
     const [playerStatus, setPlayerStatus] = useState(PlayerState.Loading)
     const [playerVolume, setPlayerVolume] = useState(1)
+    const [brokenThumbnail, setBrokenThumbnail] = useState(false)
 
     useEffect(() => {
         // Manually get the HTML audio element and set event handlers
@@ -37,15 +39,19 @@ const AudioPlayer: FC<AudioPlayerProps> = ({ audioUrl, fileName, modifiedTime })
         }
     }, [])
 
+    const hasThumbnail = thumbnailUrl && !brokenThumbnail
+    const isPlaying = playerStatus === PlayerState.Playing
+    const isLoading = playerStatus === PlayerState.Loading
+
     return (
         <div className="flex flex-col space-y-4 md:flex-row md:space-x-4">
             {/* Album art / icon */}
-            <div className="relative flex aspect-square w-full items-center justify-center rounded bg-gray-100 transition-all duration-75 dark:bg-gray-700 md:w-48">
+            <div className="relative flex aspect-square w-full items-center justify-center rounded-lg bg-gray-100 transition-all duration-75 dark:bg-gray-700/50 md:w-48">
                 {/* Loading overlay */}
                 <div
-                    className={`absolute z-20 flex h-full w-full items-center justify-center rounded transition-all duration-300 ${playerStatus === PlayerState.Loading
-                        ? 'bg-white/80 dark:bg-gray-800/80'
-                        : 'bg-transparent opacity-0'
+                    className={`absolute z-20 flex h-full w-full items-center justify-center rounded-lg transition-all duration-300 ${isLoading
+                            ? 'bg-white/80 dark:bg-gray-800/80'
+                            : 'bg-transparent opacity-0'
                         }`}
                 >
                     <FontAwesomeIcon
@@ -54,11 +60,22 @@ const AudioPlayer: FC<AudioPlayerProps> = ({ audioUrl, fileName, modifiedTime })
                     />
                 </div>
 
-                {/* Music icon */}
-                <FontAwesomeIcon
-                    icon="music"
-                    className={`h-16 w-16 text-gray-400 ${playerStatus === PlayerState.Playing ? 'animate-pulse' : ''}`}
-                />
+                {hasThumbnail ? (
+                    <div className="absolute m-4 aspect-square w-[calc(100%-2rem)] rounded-full shadow-lg overflow-hidden">
+                        <img
+                            className={`h-full w-full rounded-full object-cover object-center ${isPlaying ? 'animate-spin-slow' : ''
+                                }`}
+                            src={thumbnailUrl}
+                            alt={fileName}
+                            onError={() => setBrokenThumbnail(true)}
+                        />
+                    </div>
+                ) : (
+                    <FontAwesomeIcon
+                        icon="music"
+                        className={`z-10 h-16 w-16 text-gray-400 ${isPlaying ? 'animate-spin-slow' : ''}`}
+                    />
+                )}
             </div>
 
             {/* File info and player */}
